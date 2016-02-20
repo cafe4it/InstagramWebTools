@@ -1,4 +1,4 @@
-require('clipboard');
+import Clipboard from 'clipboard';
 
 var _IS_DETAIL_PAGE = false;
 
@@ -13,13 +13,13 @@ $(document).on('ready',function(){
 //Clipboard
 
 //SaveAs
-    var btnSaveAs = document.createElement('a');
+/*    var btnSaveAs = document.createElement('a');
     btnSaveAs.id = 'btnSaveAs';
     btnSaveAs.style.cssText = 'display : none!important;width : 0px !imporant; height : 0px !important;';
     document.body.appendChild(btnSaveAs);
     $(btnSaveAs).on('click', debounce(function (event) {
         console.log('download.')
-    }, 500));
+    }, 500));*/
 
     $(document.body).on('mouseenter','a._8mlbc,article > div._22yr2, div._rudo5, a._c2kdw',function(e){
         var context = $(this).parent().context;
@@ -144,15 +144,15 @@ function showMenuContext(elem){
             type : _mediaType
         }});
 
-    console.info(_mediaSrc, _mediaType);
+    //console.info(_mediaSrc, _mediaType);
 
     if(_IS_DETAIL_PAGE){
         $('#btnClipboard').attr('data-clipboard-text', _mediaSrc);
-        $('#btnSaveAs').attr({'href' :  _mediaSrc, 'download' : getFileNameFromUrl(_mediaSrc)});
+        //$('#btnSaveAs').attr({'href' :  _mediaSrc, 'download' : getFileNameFromUrl(_mediaSrc)});
     }else{
         $(elem).on('contextmenu',function(){
             $('#btnClipboard').attr('data-clipboard-text', _mediaSrc);
-            $('#btnSaveAs').attr({'href' :  _mediaSrc, 'download' : getFileNameFromUrl(_mediaSrc)});
+            //$('#btnSaveAs').attr({'href' :  _mediaSrc, 'download' : getFileNameFromUrl(_mediaSrc)});
         })
     }
 
@@ -178,12 +178,9 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse){
             if(appAPI.isMatchPages("*.instagram.com/p/*")){
                 appAPI.pageAction.show();
                 _IS_DETAIL_PAGE = true;
-                var rs = getMediaSrc($, 'article._j5hrx');
+                var rs = getMediaSrc('article._j5hrx');
                 if(rs._mediaSrc){
-                    $('#btnSaveAs').attr({
-                        href : rs._mediaSrc,
-                        download : rs._mediaName
-                    })
+
                 }
             }else{
                 appAPI.pageAction.hide();
@@ -191,10 +188,8 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse){
             }
         }
     } else if(msg.action === 'copyURL'){
+        console.log('Copied!');
         if(!$('#btnClipboard').attr('data-clipboard-text')) return;
         $('#btnClipboard').click();
-    } else if(msg.action === 'saveAs'){
-        if(!$('#btnSaveAs').attr('download')) return;
-        document.getElementById('btnSaveAs').click();
     }
 })
