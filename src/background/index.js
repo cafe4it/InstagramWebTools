@@ -3,12 +3,25 @@
 //welcome('background/index.js');
 
 let MEDIA = undefined;
+let _IS_DETAIL_PAGE = false;
+let _IS_SHOW_PAGE_ACTION = true;
+
+const showPageAction = function (tabId, isShow) {
+    chrome.pageAction.show(tabId);
+    _IS_DETAIL_PAGE = isShow;
+    var title = (_IS_DETAIL_PAGE) ? "Ready for download" : "Instagram Web Tools";
+
+    chrome.pageAction.setPopup({
+        popup: popup,
+        tabId: tabId
+    });
+}
 
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.action === 'show-contextMenuInstagram') {
         var subTitle = (msg.data.type === 'VIDEO') ? 'video' : 'image';
         MEDIA = msg.data;
-        console.info(MEDIA);
+        //console.info(MEDIA);
         chrome.contextMenus.create({
             id: 'showContextMenuInstagram_SaveAs',
             title: "Save " + subTitle + " as...",
@@ -24,10 +37,19 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             title: "Open " + subTitle + " in new tab",
             contexts: ["all"]
         });
+
+        if(_IS_SHOW_PAGE_ACTION === false){
+            showPageAction(sender.tab.id, true);
+        }
     } else if (msg.action === 'remove-contextMenuInstagram') {
         chrome.contextMenus.removeAll();
-    } else if (msg.action === 'update-Media'){
+    } else if (msg.action === 'update-Media') {
         MEDIA = msg.data;
+    } else if (msg.action === 'isDetailPage') {
+        showPageAction(sender.tab.id, msg.data);
+    } else if (msg.action === 'hidePageAction'){
+        _IS_SHOW_PAGE_ACTION = false;
+        chrome.pageAction.hide(sender.tab.id);
     }
 });
 
@@ -40,52 +62,16 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
     } else if (info.menuItemId === 'showContextMenuInstagram_OpenInNewTab') {
         chrome.tabs.create({url: MEDIA.src});
     }
-})
+});
 
-// Setting popup icon
-
-// When we defined browser_action
-if (chrome.browserAction) {
-    chrome.browserAction.setIcon({
-        path: require("icons/webpack-38.png")
-    })
-
-// When we defined page_action
-} else if (chrome.pageAction) {
-
-    const showPageAction = function (tabId) {
-        chrome.pageAction.show(tabId);
-
-        chrome.pageAction.setIcon({
-            path: require("icons/webpack-38.png"),
-            tabId: tabId
-        })
+chrome.pageAction.onClicked.addListener(function (tab) {
+    if (_IS_DETAIL_PAGE && MEDIA && MEDIA.src !== null) {
+        chrome.downloads.download({url: MEDIA.src});
     }
+});
 
-    chrome.runtime.onInstalled.addListener(function () {
-        // Replace all rules ...
-        chrome.declarativeContent.onPageChanged.removeRules(undefined, function () {
-            // With a new rule ...
-            chrome.declarativeContent.onPageChanged.addRules([
-                {
-                    // That fires when a page's URL contains a 'g' ...
-                    conditions: [
-                        new chrome.declarativeContent.PageStateMatcher({
-                            pageUrl: {hostEquals: 'instagram.com'},
-                        })
-                    ],
-                    // And shows the extension's page action.
-                    actions: [new chrome.declarativeContent.ShowPageAction()]
-                }
-            ]);
-        });
-    });
-
-
-    // Show page action on each page update
-    /*  chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-     showPageAction(tabId)
-     });*/
-}
-
-// When the extension is installed or upgraded ...
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    if (changeInfo.status === 'complete') {
+        chrome.tabs.sendMessage(tabId, {action: 'tabUpdated'});
+    }
+})

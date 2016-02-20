@@ -17,7 +17,6 @@
   "page_action": {
     "default_title": "Ready for download",
     "default_icon": {
-      "19": "$assets/webpack-19.png",
       "38": "$assets/webpack-38.png"
     }
   },
@@ -30,7 +29,7 @@
     "declarativeContent"
   ],
   "icons": {
-    "19": "icons/webpack-19.png",
+    "19": "icons/webpack-green-38.png",
     "38": "icons/webpack-38.png",
     "16": "icons/webpack-16.png",
     "32": "icons/webpack-32.png",
