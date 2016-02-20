@@ -15,7 +15,8 @@
     "scripts": ["background/index.js"]
   },
   "page_action": {
-    "default_title": "Ready for download",
+    "default_title": "Instagram Web Tools",
+    "default_popup": "popup/index.html",
     "default_icon": {
       "38": "$assets/webpack-38.png"
     }

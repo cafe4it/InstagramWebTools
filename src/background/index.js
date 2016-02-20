@@ -10,6 +10,12 @@ const showPageAction = function (tabId, isShow) {
     chrome.pageAction.show(tabId);
     _IS_DETAIL_PAGE = isShow;
     var title = (_IS_DETAIL_PAGE) ? "Ready for download" : "Instagram Web Tools";
+    var popup = (_IS_DETAIL_PAGE) ? "" : "popup/index.html";
+
+    chrome.pageAction.setTitle({
+        title: title,
+        tabId: tabId
+    });
 
     chrome.pageAction.setPopup({
         popup: popup,
