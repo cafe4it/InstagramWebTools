@@ -5,6 +5,7 @@ import Action      from './processor/action'
 import Background  from './processor/background'
 import Content     from './processor/content'
 import Overrides   from './processor/overrides'
+import Locales from './processor/locales'
 
 
 const processors = [
@@ -21,7 +22,9 @@ const processors = [
   // Process content script
   Content,
   // Process overrides
-  Overrides
+  Overrides,
+  // Process locales
+  Locales
 ]
 
 export default processors

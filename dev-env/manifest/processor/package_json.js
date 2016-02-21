@@ -8,7 +8,7 @@ import * as paths from '../../paths'
 export default function(manifest) {
   const packageConfig = JSON.parse(fs.readFileSync(paths.packageJson, 'utf8'))
 
-  manifest = _.merge({}, manifest, _.pick(packageConfig, 'name', 'description', 'version'));
+  manifest = _.merge({}, manifest, _.pick(packageConfig, 'name', 'description', 'version','default_locale'));
 
   return {manifest}
 }

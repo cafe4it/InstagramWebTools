@@ -3,7 +3,6 @@
   "description" : "Easy download photos, images from www.instagram.com",
   "version": "0.1.0",
   "manifest_version": 2,
-  "homepage_url": "https://github.com/schovi/webpack-chrome-extension",
   "content_scripts": [
     {
       "matches": ["*://*.instagram.com/*"],
@@ -21,15 +20,13 @@
     }
   },
   "permissions": [
-    "activeTab",
     "contextMenus",
     "background",
     "tabs",
-    "downloads",
-    "declarativeContent"
+    "downloads"
   ],
   "icons": {
-    "19": "icons/webpack-green-38.png",
+    "19": "icons/webpack-19.png",
     "38": "icons/webpack-38.png",
     "16": "icons/webpack-16.png",
     "32": "icons/webpack-32.png",

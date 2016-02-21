@@ -8,7 +8,7 @@ let _IS_SHOW_PAGE_ACTION = true;
 
 const showPageAction = function (tabId, isShow) {
     _IS_DETAIL_PAGE = isShow;
-    var title = (_IS_DETAIL_PAGE) ? "Ready for download" : "Instagram Web Tools";
+    var title = (_IS_DETAIL_PAGE) ? chrome.i18n.getMessage('popupReadyForDownload') : chrome.i18n.getMessage('extName');
     if(_IS_DETAIL_PAGE){
         chrome.pageAction.show(tabId);
     }else{
@@ -22,22 +22,22 @@ const showPageAction = function (tabId, isShow) {
 
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.action === 'show-contextMenuInstagram') {
-        var subTitle = (msg.data.type === 'VIDEO') ? 'video' : 'image';
+        var subTitle = (msg.data.type === 'VIDEO') ? chrome.i18n.getMessage('typeVideo') : chrome.i18n.getMessage('typeImage');
         MEDIA = msg.data;
         //console.info(MEDIA);
         chrome.contextMenus.create({
             id: 'showContextMenuInstagram_SaveAs',
-            title: "Save " + subTitle + " as...",
+            title: chrome.i18n.getMessage('contextMenu_SaveAs', subTitle),
             contexts: ["all"]
         });
         chrome.contextMenus.create({
             id: 'showContextMenuInstagram_CopyURL',
-            title: "Copy " + subTitle + " URL",
+            title: chrome.i18n.getMessage('contextMenu_CopyURL', subTitle),
             contexts: ["all"]
         });
         chrome.contextMenus.create({
             id: 'showContextMenuInstagram_OpenInNewTab',
-            title: "Open " + subTitle + " in new tab",
+            title: chrome.i18n.getMessage('contextMenu_OpenInNewTab', subTitle),
             contexts: ["all"]
         });
 
