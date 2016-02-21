@@ -7,12 +7,15 @@ let _IS_DETAIL_PAGE = false;
 let _IS_SHOW_PAGE_ACTION = true;
 
 const showPageAction = function (tabId, isShow) {
-    chrome.pageAction.show(tabId);
     _IS_DETAIL_PAGE = isShow;
     var title = (_IS_DETAIL_PAGE) ? "Ready for download" : "Instagram Web Tools";
-
-    chrome.pageAction.setPopup({
-        popup: popup,
+    if(_IS_DETAIL_PAGE){
+        chrome.pageAction.show(tabId);
+    }else{
+        chrome.pageAction.hide(tabId);
+    }
+    chrome.pageAction.setTitle({
+        title : title,
         tabId: tabId
     });
 }
@@ -38,7 +41,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             contexts: ["all"]
         });
 
-        if(_IS_SHOW_PAGE_ACTION === false){
+        if(_IS_DETAIL_PAGE && _IS_SHOW_PAGE_ACTION === false){
             showPageAction(sender.tab.id, true);
         }
     } else if (msg.action === 'remove-contextMenuInstagram') {
