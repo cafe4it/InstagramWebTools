@@ -1,4 +1,5 @@
 import Clipboard from 'clipboard';
+import _ from 'lodash';
 
 var _IS_DETAIL_PAGE = false;
 
@@ -199,6 +200,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         setTimeout(function(){
             isDetailPage(window.location.href);
         },100);
+        console.log(window._sharedData);
     } else if (msg.action === 'copyURL') {
         if (!$('#btnClipboard').attr('data-clipboard-text')) return;
         $('#btnClipboard').click();
