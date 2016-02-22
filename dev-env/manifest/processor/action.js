@@ -1,6 +1,6 @@
 import html from './lib/html'
 
-const process = function({action: {default_popup} = {}, buildPath, scripts}) {
+const process = function({action: {default_popup} = {}, buildPath = null, scripts = null}) {
   if(!default_popup) return
 
   scripts.push(html(default_popup, buildPath))

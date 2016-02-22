@@ -1,0 +1,26 @@
+{
+  "extName" : {
+    "message" : "Instagram Easy Downloader"
+  },
+  "extDescription" : {
+    "message" : "Dễ dàng tải/sao chép ảnh độ phân giải cao 1080x1080px(nếu có)/video trên www.instagram.com"
+  },
+  "popupReadyForDownload" : {
+    "message" : "Sẵn sàng tải xuống"
+  },
+  "typeImage" :{
+    "message" : "ảnh"
+  },
+  "typeVideo" :{
+    "message" : "video"
+  },
+  "contextMenu_SaveAs" :{
+    "message" : "Lưu $1 dưới dạng..."
+  },
+  "contextMenu_CopyURL" :{
+    "message" : "Sao chép liên kết $1"
+  },
+  "contextMenu_OpenInNewTab" :{
+    "message" : "Mở $1 trong cửa sổ mới"
+  }
+}

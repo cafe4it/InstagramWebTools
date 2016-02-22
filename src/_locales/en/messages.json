@@ -1,0 +1,26 @@
+{
+  "extName" : {
+    "message" : "Instagram Easy Downloader"
+  },
+  "extDescription" : {
+    "message" : "Easily download/copy images with high resolution 1080*1080 px (if any), videos on www.instagram.com"
+  },
+  "popupReadyForDownload" : {
+    "message" : "Ready for download"
+  },
+  "typeImage" :{
+    "message" : "image"
+  },
+  "typeVideo" :{
+    "message" : "video"
+  },
+  "contextMenu_SaveAs" :{
+    "message" : "Save $1 as..."
+  },
+  "contextMenu_CopyURL" :{
+    "message" : "Copy $1 URL"
+  },
+  "contextMenu_OpenInNewTab" :{
+    "message" : "Open $1 in new tab"
+  }
+}
