@@ -4,18 +4,28 @@
 
 let MEDIA = undefined;
 let _IS_DETAIL_PAGE = false;
+let _IS_USER_PAGE = false;
 let _IS_SHOW_PAGE_ACTION = true;
 
-const showPageAction = function (tabId, isShow) {
-    _IS_DETAIL_PAGE = isShow;
-    var title = (_IS_DETAIL_PAGE) ? chrome.i18n.getMessage('popupReadyForDownload') : chrome.i18n.getMessage('extName');
-    if(_IS_DETAIL_PAGE){
+const showPageAction = function (tabId, data) {
+    _IS_DETAIL_PAGE = data.isDetailPage;
+    _IS_USER_PAGE = data.isUserPage;
+
+    if(_IS_DETAIL_PAGE || _IS_USER_PAGE){
         chrome.pageAction.show(tabId);
     }else{
         chrome.pageAction.hide(tabId);
     }
+
+    var title = (_IS_DETAIL_PAGE) ? chrome.i18n.getMessage('popupReadyForDownload') : chrome.i18n.getMessage('extName');
+    var popup = (_IS_USER_PAGE) ? 'popup/index.html' : '';
+
     chrome.pageAction.setTitle({
         title : title,
+        tabId: tabId
+    });
+    chrome.pageAction.setPopup({
+        popup : popup,
         tabId: tabId
     });
 }
@@ -77,4 +87,4 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (changeInfo.status === 'complete') {
         chrome.tabs.sendMessage(tabId, {action: 'tabUpdated'});
     }
-})
+});

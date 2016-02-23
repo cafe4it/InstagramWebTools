@@ -2,6 +2,7 @@ import Clipboard from 'clipboard';
 import _ from 'lodash';
 
 var _IS_DETAIL_PAGE = false;
+var _IS_USER_PAGE = false;
 
 
 $(document).on('ready', function () {
@@ -175,9 +176,14 @@ function removeMenuContext() {
 }
 
 function isDetailPage(href){
-    var detailPageRegex = /instagram\.com\/p\//g;
-    _IS_DETAIL_PAGE = (href.match(detailPageRegex) !== null);
-    chrome.runtime.sendMessage({action : 'isDetailPage', data : _IS_DETAIL_PAGE});
+    var detailPageRegex = /instagram\.com\/p\//g,
+        userPageRegex = /instagram\.com\/[\w\.]+\/$/g;
+    _IS_DETAIL_PAGE = detailPageRegex.test(href);
+    _IS_USER_PAGE = userPageRegex.test(href);
+    chrome.runtime.sendMessage({action : 'isDetailPage', data : {
+        isDetailPage : _IS_DETAIL_PAGE,
+        isUserPage : _IS_USER_PAGE
+    }});
     if(_IS_DETAIL_PAGE){
         var rs = getMediaSrc('article._j5hrx');
         if (rs && rs._mediaSrc !== null && rs._mediaType !== null) {
@@ -200,9 +206,59 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         setTimeout(function(){
             isDetailPage(window.location.href);
         },100);
-        console.log(window._sharedData);
     } else if (msg.action === 'copyURL') {
         if (!$('#btnClipboard').attr('data-clipboard-text')) return;
         $('#btnClipboard').click();
+    } else if(msg.action === 'popup_AskUser' && _IS_USER_PAGE){
+        queryUsername();
+        sendResponse({username : window.location.pathname.match(/[\w\.]+/g)[0] || ''});
     }
 });
+
+function queryUsername(){
+
+    var userUrl = window.location.href;
+    var htmlData = $.ajax({
+        method : 'GET',
+        url : userUrl,
+        async: false
+    }).responseText;
+
+    var _sharedData = htmlData.match(/window._sharedData = (.*)\;<\/script\>/);
+    var cookies = htmlData.match(/Set-Cookie: (.*);/);
+
+    if(_sharedData !== null && _sharedData[1] !== null){
+        var obj = JSON.parse(_sharedData[1]);
+        //console.log(obj);
+        var user = obj.entry_data.ProfilePage[0].user;
+
+        var nodes = user.media.nodes;
+        var userId = user.id;
+        var has_next_page = user.media.page_info.has_next_page;
+        var end_cursor = user.media.page_info.end_cursor;
+        while(has_next_page){
+            var postData = "q=ig_user("+userId+")+%7B+media.after("+end_cursor+"%2C+33)+%7B%0A++count%2C%0A++nodes+%7B%0A++++caption%2C%0A++++code%2C%0A++++comments+%7B%0A++++++count%0A++++%7D%2C%0A++++date%2C%0A++++dimensions+%7B%0A++++++height%2C%0A++++++width%0A++++%7D%2C%0A++++display_src%2C%0A++++id%2C%0A++++is_video%2C%0A++++likes+%7B%0A++++++count%0A++++%7D%2C%0A++++owner+%7B%0A++++++id%0A++++%7D%2C%0A++++thumbnail_src%0A++%7D%2C%0A++page_info%0A%7D%0A+%7D&ref=users%3A%3Ashow";
+
+            const queryURL = 'https://www.instagram.com/query/';
+            var res = $.ajax({
+                method: 'POST',
+                headers : {
+                    "x-instagram-ajax" : 1,
+                    "x-csrftoken" : obj.config.csrf_token
+                },
+                url : queryURL,
+                data : postData,
+                async : false
+            }).responseJSON;
+            if(res){
+                nodes.push.apply(nodes,res.media.nodes);
+                has_next_page = res.media.page_info.has_next_page;
+                end_cursor = res.media.page_info.end_cursor;
+            }else{
+                has_next_page = false;
+            }
+        }
+
+        console.log('total', nodes.length);
+    }
+}

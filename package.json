@@ -2,7 +2,7 @@
   "name": "__MSG_extName__",
   "version": "0.1.0",
   "description": "__MSG_extDescription__",
-  "default_locale" : "en",
+  "default_locale": "en",
   "private": true,
   "scripts": {
     "start": "npm run dev",
@@ -23,9 +23,11 @@
     "hmr"
   ],
   "dependencies": {
+    "purecss": "^0.6.0",
     "react": "0.14.7"
   },
   "devDependencies": {
+    "async": "^1.5.2",
     "babel-cli": "6.4.5",
     "babel-core": "6.4.5",
     "babel-loader": "6.2.1",
@@ -35,16 +37,20 @@
     "chokidar": "1.4.2",
     "cli-color": "1.1.0",
     "clipboard": "^1.5.8",
-    "css-loader": "0.23.1",
+    "css-loader": "^0.23.1",
     "express": "4.13.4",
     "file-loader": "0.8.5",
+    "fs": "0.0.2",
     "fs-extra": "0.26.5",
+    "http_request": "^0.1.2",
     "jquery": "^2.2.0",
     "json-loader": "0.5.4",
     "lodash": "4.1.0",
-    "style-loader": "0.13.0",
+    "request": "^2.69.0",
+    "style-loader": "^0.13.0",
     "url-loader": "0.5.7",
     "webpack": "1.12.2",
-    "webpack-dev-server": "1.12.1"
+    "webpack-dev-server": "1.12.1",
+    "x-ray": "^2.0.3"
   }
 }

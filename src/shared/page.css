@@ -1,6 +1,27 @@
-body {
-  width: 600px;
-  font-size: 1.5em;
-  background-color: #222;
-  color: #bada55;
+.button-success, .button-error, .button-warning, .button-secondary {
+    color: white;
+    border-radius: 4px;
+    text-shadow: 0 1px 1px #D1D3DB;
+}
+
+.button-success {
+    background: #1CB841;
+}
+
+.button-error {
+    background: #CA3C3C;
+}
+
+.button-warning {
+    background: #DF7514;
+}
+
+.button-secondary {
+    background: #42B8DD;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
 }

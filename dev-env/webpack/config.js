@@ -25,8 +25,7 @@ function makeStyleLoaders() {
 
     return {
       loader: loader,
-      test: new RegExp('\\.(' + ext + ')$'),
-      exclude: /node_modules/
+      test: new RegExp('\\.(' + ext + ')$')
     };
   });
 }
