@@ -10,9 +10,9 @@ module.exports = function(webpackConfig) {
   var compiler = webpack(webpackConfig);
 
   var webpackDevServerOptions = {
-    contentBase: 'https://localhost:3001',
+    contentBase: 'http://localhost:3001',
     publicPath: webpackConfig.output.publicPath,
-    https: true,
+    https: false,
     // lazy: true,
     // watchDelay: 50,
     hot: true,
@@ -40,7 +40,7 @@ module.exports = function(webpackConfig) {
     if (err) {
       console.log(err)
     } else {
-      console.log('Listening at https://' + host + ':' + port);
+      console.log('Listening at http://' + host + ':' + port);
     }
   })
 }
