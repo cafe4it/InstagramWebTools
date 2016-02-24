@@ -11,9 +11,9 @@ const showPageAction = function (tabId, data) {
     _IS_DETAIL_PAGE = data.isDetailPage;
     _IS_USER_PAGE = data.isUserPage;
 
-    if(_IS_DETAIL_PAGE || _IS_USER_PAGE){
+    if (_IS_DETAIL_PAGE) {
         chrome.pageAction.show(tabId);
-    }else{
+    } else {
         chrome.pageAction.hide(tabId);
     }
 
@@ -21,11 +21,11 @@ const showPageAction = function (tabId, data) {
     var popup = (_IS_USER_PAGE) ? 'popup/index.html' : '';
 
     chrome.pageAction.setTitle({
-        title : title,
+        title: title,
         tabId: tabId
     });
     chrome.pageAction.setPopup({
-        popup : popup,
+        popup: popup,
         tabId: tabId
     });
 }
@@ -51,7 +51,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             contexts: ["all"]
         });
 
-        if(_IS_DETAIL_PAGE && _IS_SHOW_PAGE_ACTION === false){
+        if (_IS_DETAIL_PAGE && _IS_SHOW_PAGE_ACTION === false) {
             showPageAction(sender.tab.id, true);
         }
     } else if (msg.action === 'remove-contextMenuInstagram') {
@@ -60,20 +60,29 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         MEDIA = msg.data;
     } else if (msg.action === 'isDetailPage') {
         showPageAction(sender.tab.id, msg.data);
-    } else if (msg.action === 'hidePageAction'){
+    } else if (msg.action === 'hidePageAction') {
         _IS_SHOW_PAGE_ACTION = false;
         chrome.pageAction.hide(sender.tab.id);
+    } else if (msg.action === 'download-Media') {
+        chrome.downloads.download({url: MEDIA.src});
+    } else if (msg.action === 'copy-Media') {
+        chrome.tabs.sendMessage(sender.tab.id, {action: 'copyURL'});
+    } else if (msg.action === 'open-Media') {
+        chrome.tabs.create({url: MEDIA.src});
+    } else if (msg.action === 'media-toTumblr') {
+        const tumblrWidget = 'https://www.tumblr.com/widgets/share/tool/preview?url=' + encodeURIComponent(MEDIA.src);
+        chrome.windows.create({url: tumblrWidget, width: 100, height: 100, focused: true});
     }
 });
 
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
     if (!MEDIA) return;
     if (info.menuItemId === 'showContextMenuInstagram_SaveAs') {
-        chrome.downloads.download({url: MEDIA.src});
+        chrome.runtime.sendMessage({action: 'download-Media'});
     } else if (info.menuItemId === 'showContextMenuInstagram_CopyURL') {
-        chrome.tabs.sendMessage(tab.id, {action: 'copyURL'});
+        chrome.runtime.sendMessage({action: 'copy-Media'});
     } else if (info.menuItemId === 'showContextMenuInstagram_OpenInNewTab') {
-        chrome.tabs.create({url: MEDIA.src});
+        chrome.runtime.sendMessage({action: 'open-Media'});
     }
 });
 

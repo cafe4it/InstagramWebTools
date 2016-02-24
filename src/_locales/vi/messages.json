@@ -22,5 +22,20 @@
   },
   "contextMenu_OpenInNewTab" :{
     "message" : "Mở $1 trong cửa sổ mới"
+  },
+  "contextMenu_ShareToTumblr": {
+    "message": "Chia sẻ $1 to Tumblr"
+  },
+  "contextMenu_ShareToFacebook": {
+    "message": "Chia sẻ $1 to Facebook"
+  },
+  "button_DownloadAll": {
+    "message": "Lưu tất cả"
+  },
+  "button_DownloadImages": {
+    "message": "Chỉ lưu ảnh"
+  },
+  "button_DownloadVideos": {
+    "message": "Chỉ lưu video"
   }
 }

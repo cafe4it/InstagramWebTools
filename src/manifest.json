@@ -24,7 +24,8 @@
     "contextMenus",
     "background",
     "tabs",
-    "downloads"
+    "downloads",
+    "storage"
   ],
   "icons": {
     "19": "icons/webpack-19.png",
