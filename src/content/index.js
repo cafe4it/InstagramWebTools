@@ -1,6 +1,7 @@
 import Clipboard from 'clipboard';
 import _ from 'lodash';
 
+
 import '../shared/reset.css';
 import '../shared/tooltip.css';
 import './index.css';
@@ -310,11 +311,14 @@ function isDetailPage(href) {
             newSpan.appendChild(button);
             h1.parentNode.appendChild(newSpan);
             $(button).on('click', function (e) {
-                e.preventDefault();
-                chrome.runtime.sendMessage({
-                    action : 'scan-user',
-                    data : window.location.href
-                })
+                //e.preventDefault();
+                setTimeout(function(){
+                    chrome.runtime.sendMessage({
+                        action : 'scan-user',
+                        data : window.location.href
+                    });
+                },1000);
+                $(this).prop('disabled',true);
             })
         }
     }
