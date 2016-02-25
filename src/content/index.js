@@ -2,7 +2,9 @@ import Clipboard from 'clipboard';
 import _ from 'lodash';
 
 import '../shared/reset.css';
+import '../shared/tooltip.css';
 import './index.css';
+import scanAllFromUser from '../shared/index.js';
 
 var _IS_DETAIL_PAGE = false;
 var _IS_USER_PAGE = false;
@@ -23,8 +25,7 @@ const icons = [
 ]
 
 $(document).on('ready', function () {
-//Clipboard
-    //isDetailPage(window.location.href);
+
     var btnClipboard = document.createElement('button');
     btnClipboard.id = 'btnClipboard';
     btnClipboard.style.cssText = 'display : none!important;width : 0px !imporant; height : 0px !important;';
@@ -198,8 +199,8 @@ function addToolsPerMedia(elem, _mediaSrc, _mediaType) {
         var div = document.createElement('div');
         div.setAttribute('class', 'reset-this InstagramWebTools');
         var subTitle = (_mediaType === 'VIDEO') ? chrome.i18n.getMessage('typeVideo') : chrome.i18n.getMessage('typeImage');
-        var buttons = ['contextMenu_SaveAs', 'contextMenu_CopyURL', 'contextMenu_OpenInNewTab','contextMenu_ShareToTumblr'];
-        if(_mediaType === 'VIDEO') buttons = ['contextMenu_SaveAs', 'contextMenu_CopyURL', 'contextMenu_OpenInNewTab'];
+        var buttons = ['contextMenu_SaveAs', 'contextMenu_CopyURL', 'contextMenu_OpenInNewTab', 'contextMenu_ShareToTumblr'];
+        if (_mediaType === 'VIDEO') buttons = ['contextMenu_SaveAs', 'contextMenu_CopyURL', 'contextMenu_OpenInNewTab'];
         buttons.map(function (ii, i) {
             var tooltip = chrome.i18n.getMessage(ii, subTitle);
             var link = document.createElement('a');
@@ -227,12 +228,14 @@ function addToolsPerMedia(elem, _mediaSrc, _mediaType) {
                         action = 'open-Media';
                         break;
                     case 'contextMenu_ShareToTumblr':
-                        shareToTumblr(_mediaSrc,'');
+                        shareToTumblr(_mediaSrc, '');
                         break;
                 }
-                chrome.runtime.sendMessage({
-                    action: action
-                });
+                if (action !== '') {
+                    chrome.runtime.sendMessage({
+                        action: action
+                    });
+                }
             })
         })
         /*        var button = document.createElement('img');
@@ -256,6 +259,7 @@ function isDetailPage(href) {
         userPageRegex = /instagram\.com\/[\w\.]+\/$/g;
     _IS_DETAIL_PAGE = detailPageRegex.test(href);
     _IS_USER_PAGE = userPageRegex.test(href);
+
     chrome.runtime.sendMessage({
         action: 'isDetailPage', data: {
             isDetailPage: _IS_DETAIL_PAGE,
@@ -279,38 +283,39 @@ function isDetailPage(href) {
     }
 
     if (_IS_USER_PAGE) {
-        if ($('#InstagramWebTools').length > 0) return;
-        var div = document.createElement('div');
-        div.id = 'InstagramWebTools';
-        div.setAttribute('class', 'reset-this');
-        ['button_DownloadAll', 'button_DownloadImages', 'button_DownloadVideos'].map(function (i) {
-            var button = document.createElement('button');
-            button.textContent = chrome.i18n.getMessage(i);
-            button.setAttribute('class', '_k2yal _csba8 _i46jh _nv5lf');
-            button.id = i;
-            div.appendChild(button);
-        });
+        /*if ($('#InstagramWebTools').length > 0) return;
+         var div = document.createElement('div');
+         div.id = 'InstagramWebTools';
+         div.setAttribute('class', 'reset-this');
+         ['button_DownloadAll', 'button_DownloadImages', 'button_DownloadVideos'].map(function (i) {
+         var button = document.createElement('button');
+         button.textContent = chrome.i18n.getMessage(i);
+         button.setAttribute('class', '_k2yal _csba8 _i46jh _nv5lf');
+         button.id = i;
+         div.appendChild(button);
+         });
 
-        var header = $('article > header')[0];
-        header.parentNode.insertBefore(div, header.nextSibling);
-        var a = document.createElement('a');
-        a.setAttribute('style','display:none!important');
-        a.id = '640684';
-        header.parentNode.insertBefore(a, div.nextSibling);
-        if (window.AED_SHOW) {
-            window.AED_SHOW({wid: '640684',shortkey:'qRzBeqbMb', size:'468x60', custom:{}});
-        } else {
-            window.AED_ONLOAD = window.AED_ONLOAD || [];
-            window.AED_ONLOAD.push({wid:'640684',shortkey:'qRzBeqbMb',size:'468x60',custom:{}});
-            if (!document.getElementById("ae-ad-script-$")) {
-                var s = document.createElement("script"),
-                    h = document.getElementsByTagName("head")[0];
-                s.id = 'ae-ad-script-$';
-                s.charset = "utf-8";
-                s.async = !0;
-                s.src = "https://i.alicdn.com/ae-game/thirdparty/show-window/index.js";
-                h.insertBefore(s, h.firstChild)
-            }
+         var header = $('article > header')[0];
+         header.parentNode.insertBefore(div, header.nextSibling);*/
+
+        if ($('#btnScanAll').length > 0) return;
+        var h1 = $('article h1')[0];
+        if (h1) {
+            var newSpan = document.createElement('span');
+            newSpan.setAttribute('class', '_jxp6f _htenz');
+            var button = document.createElement('button');
+            button.id = 'btnScanAll';
+            button.textContent = chrome.i18n.getMessage('button_ScanAll');
+            button.setAttribute('class', '_jvpff _k2yal _csba8 _i46jh _nv5lf');
+            newSpan.appendChild(button);
+            h1.parentNode.appendChild(newSpan);
+            $(button).on('click', function (e) {
+                e.preventDefault();
+                chrome.runtime.sendMessage({
+                    action : 'scan-user',
+                    data : window.location.href
+                })
+            })
         }
     }
 }
@@ -326,57 +331,13 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         $('#btnClipboard').click();
     } else if (msg.action === 'popup_AskUser' && _IS_USER_PAGE) {
         sendResponse({username: window.location.pathname.match(/[\w\.]+/g)[0] || ''});
+    } else if (msg.action === 'request-scan-user') {
+        var nodes = scanAllFromUser(msg.data);
+        sendResponse({id : msg.data, nodes : nodes});
     }
 });
 
-function queryUsername() {
-
-    var userUrl = window.location.href;
-    var htmlData = $.ajax({
-        method: 'GET',
-        url: userUrl,
-        async: false
-    }).responseText;
-
-    var _sharedData = htmlData.match(/window._sharedData = (.*)\;<\/script\>/);
-    var cookies = htmlData.match(/Set-Cookie: (.*);/);
-
-    if (_sharedData !== null && _sharedData[1] !== null) {
-        var obj = JSON.parse(_sharedData[1]);
-        //console.log(obj);
-        var user = obj.entry_data.ProfilePage[0].user;
-        var nodes = user.media.nodes;
-        var userId = user.id;
-        var has_next_page = (user.media.page_info) ? user.media.page_info.has_next_page : false;
-        var end_cursor = (user.media.page_info) ? user.media.page_info.end_cursor : '';
-        while (has_next_page) {
-            var postData = "q=ig_user(" + userId + ")+%7B+media.after(" + end_cursor + "%2C+33)+%7B%0A++count%2C%0A++nodes+%7B%0A++++caption%2C%0A++++code%2C%0A++++comments+%7B%0A++++++count%0A++++%7D%2C%0A++++date%2C%0A++++dimensions+%7B%0A++++++height%2C%0A++++++width%0A++++%7D%2C%0A++++display_src%2C%0A++++id%2C%0A++++is_video%2C%0A++++likes+%7B%0A++++++count%0A++++%7D%2C%0A++++owner+%7B%0A++++++id%0A++++%7D%2C%0A++++thumbnail_src%0A++%7D%2C%0A++page_info%0A%7D%0A+%7D&ref=users%3A%3Ashow";
-
-            const queryURL = 'https://www.instagram.com/query/';
-            var res = $.ajax({
-                method: 'POST',
-                headers: {
-                    "x-instagram-ajax": 1,
-                    "x-csrftoken": obj.config.csrf_token
-                },
-                url: queryURL,
-                data: postData,
-                async: false
-            }).responseJSON;
-            if (res) {
-                nodes.push.apply(nodes, res.media.nodes);
-                has_next_page = res.media.page_info.has_next_page;
-                end_cursor = res.media.page_info.end_cursor;
-            } else {
-                has_next_page = false;
-            }
-        }
-
-        console.log('total', nodes.length);
-    }
-}
-
-function shareToTumblr(href, title){
+function shareToTumblr(href, title) {
     var d = document,
         w = window,
         e = w.getSelection,
@@ -398,35 +359,16 @@ function shareToTumblr(href, title){
         d.body.appendChild(sd);
         sw = sd.offsetWidth - sd.clientWidth;
         d.body.removeChild(sd);
-    } catch (z) {};
+    } catch (z) {
+    }
+    ;
     try {
         if (!/^(.*\.)?tumblr[^.]*$/.test(l.host)) throw (0);
         tstbklt();
     } catch (z) {
-        var a = function() {
+        var a = function () {
             if (!w.open(u, '_blank', 'toolbar=0,resizable=0,status=1,scrollbars=1,width=' + (540 + sw) + ',height=600')) l.href = u;
         };
         setTimeout(a, 10);
-    }
-}
-
-function shareToFacebook(href, title){
-    var d = document,
-        f = 'https://www.facebook.com/share',
-        l = d.location,
-        e = encodeURIComponent,
-        p = '.php?src=bm&v=4&i=1456309156&u=' + e(href) + '&t=' + e(title);
-    1;
-    try {
-        if (!/^(.*\.)?facebook\.[^.]*$/.test(l.host)) throw (0);
-        share_internal_bookmarklet(p)
-    } catch (z) {
-        var a = function() {
-            if (!window.open(f + 'r' + p, 'sharer', 'toolbar=0,status=0,resizable=1,width=626,height=436')) l.href = f + p
-        };
-        if (/Firefox/.test(navigator.userAgent)) setTimeout(a, 0);
-        else {
-            a()
-        }
     }
 }

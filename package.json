@@ -38,13 +38,11 @@
     "cli-color": "1.1.0",
     "clipboard": "^1.5.8",
     "css-loader": "^0.23.1",
-
+    "deasync": "^0.1.4",
     "file-loader": "0.8.5",
-
     "jquery": "^2.2.0",
     "json-loader": "0.5.4",
     "lodash": "4.1.0",
-
     "style-loader": "^0.13.0",
     "url-loader": "0.5.7",
     "webpack": "1.12.2",

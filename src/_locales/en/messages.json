@@ -29,6 +29,9 @@
   "contextMenu_ShareToFacebook": {
     "message": "Share $1 to Facebook"
   },
+  "button_ScanAll": {
+    "message": "Scan"
+  },
   "button_DownloadAll": {
     "message": "Download All"
   },
@@ -37,5 +40,14 @@
   },
   "button_DownloadVideos": {
     "message": "Download Only Videos"
+  },
+  "popup_table_col1" :{
+    "message": "Username"
+  },
+  "popup_table_col2" :{
+    "message": "Total/Videos"
+  },
+  "popup_table_empty" :{
+    "message" : "No data..."
   }
 }

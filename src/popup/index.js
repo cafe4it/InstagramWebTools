@@ -1,69 +1,72 @@
-import 'purecss/build/base.css';
-import 'purecss/build/buttons.css';
+import 'purecss/build/base-min.css';
+import 'purecss/build/tables-min.css';
+import 'purecss/build/buttons-min.css';
+import '../shared/tooltip.css';
 import 'shared/page.css';
 import _ from 'lodash';
 
-var _CURRENT_USERNAME = null;
+var buttonTpl = _.template('<a class="<%=className%> cmd tooltip-top" data-tooltip="<%=label%>"><img src="<%=imgSrc%>" alt="<%=label%>"/></a>');
+var icons = [
+    {id: 'button_DownloadAll', src: require('../icons/button_downloadall.png')},
+    {id: 'button_DownloadImages', src: require('../icons/button_downloadimages.png')},
+    {id: 'button_DownloadVideos', src: require('../icons/button_downloadvideos.png')}
+];
+var buttons = _.map(icons, function (ii) {
+    var label = chrome.i18n.getMessage(ii.id);
+    var a = document.createElement('a');
+    a.setAttribute('class', 'cmd tooltip-top');
+    a.setAttribute('data-tooltip',label);
+    a.setAttribute('data-cmd',ii.id);
+    var img = document.createElement('img');
+    img.setAttribute('src',ii.src);
+    img.setAttribute('alt',label);
+    img.setAttribute('style','width:19px;height:19px;')
+    a.appendChild(img);
 
-$(document).ready(function(){
-    chrome.tabs.query({
-        active: true,
-        currentWindow: true
-    }, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {action : 'popup_AskUser'},function(res){
-            _CURRENT_USERNAME = res.username;
-        })
+    return $(a).prop('outerHTML');
+}).join('&nbsp;');
+$(document).ready(function () {
+    $('th.col1').html(chrome.i18n.getMessage('popup_table_col1'));
+    $('th.col2').html(chrome.i18n.getMessage('popup_table_col2'));
+    chrome.storage.local.get('InstagramWebTools', function (obj) {
+        var db = obj.InstagramWebTools;
+        var tr = _.template('<tr><td><%=userName%></td><td style="text-align: right"><%=total%>/<%=totalVideos%></td><td data-id="<%=userId%>"><%=buttons%></td></tr>');
+
+        var html = '<tr><td colspan="3" style="text-align: center">'+chrome.i18n.getMessage('popup_table_empty')+'</td></tr>';
+        if (db.users.length > 0) {
+            html = db.users.map(function (user) {
+                var username = user.id.match(/instagram.com\/(.*)\//),
+                    username = (username[1]) ? username[1] : user.id;
+                return tr({
+                    userName : username,
+                    userId: user.id,
+                    total: user.nodes.length,
+                    totalVideos: _.filter(user.nodes, function (node) {
+                        return node.is_video === true
+                    }).length || 0,
+                    buttons: buttons
+                });
+            });
+        }
+        $('table tbody').html(html);
     });
+    $('table').on('click','a.cmd',function(){
+        var userId = $(this).parent().data('id');
+        var cmd = $(this).data('cmd');
+        chrome.runtime.sendMessage({
+            action : 'download-all',
+            data : {
+                userId : userId,
+                cmd : cmd
+            }
+        })
+    })
 
-
-    $('#btnDownloadAll').click(function(e){
-        //queryUsername();
+    $('#btnClearAll').on('click', function (e) {
+        e.preventDefault();
+        var db = {
+            users: []
+        }
+        chrome.storage.local.set({InstagramWebTools: db});
     })
 });
-
-function queryUsername(){
-    if(_CURRENT_USERNAME === null) return;
-    const userUrl = 'https://www.instagram.com/' + _CURRENT_USERNAME;
-    var htmlData = $.ajax({
-        method : 'GET',
-        url : userUrl,
-        async: false
-    }).responseText;
-
-    var _sharedData = htmlData.match(/window._sharedData = (.*)\;<\/script\>/);
-    var cookies = htmlData.match(/Set-Cookie: (.*);/);
-
-    if(_sharedData !== null && _sharedData[1] !== null){
-        var obj = JSON.parse(_sharedData[1]);
-        //console.log(obj);
-        var user = obj.entry_data.ProfilePage[0].user;
-
-        var nodes = user.media.nodes;
-        var userId = user.id;
-        var has_next_page = user.media.page_info.has_next_page;
-        var end_cursor = user.media.page_info.end_cursor;
-        while(has_next_page){
-            var postData = "q=ig_user("+userId+")+%7B+media.after("+end_cursor+"%2C+33)+%7B%0A++count%2C%0A++nodes+%7B%0A++++caption%2C%0A++++code%2C%0A++++comments+%7B%0A++++++count%0A++++%7D%2C%0A++++date%2C%0A++++dimensions+%7B%0A++++++height%2C%0A++++++width%0A++++%7D%2C%0A++++display_src%2C%0A++++id%2C%0A++++is_video%2C%0A++++likes+%7B%0A++++++count%0A++++%7D%2C%0A++++owner+%7B%0A++++++id%0A++++%7D%2C%0A++++thumbnail_src%0A++%7D%2C%0A++page_info%0A%7D%0A+%7D&ref=users%3A%3Ashow";
-
-            const queryURL = 'https://www.instagram.com/query/';
-            var res = $.ajax({
-                method: 'POST',
-                headers : {
-                    "x-instagram-ajax" : 1,
-                    "x-csrftoken" : obj.config.csrf_token
-                },
-                url : queryURL,
-                data : postData,
-                async : false
-            }).responseJSON;
-            if(res){
-                nodes.push.apply(nodes,res.media.nodes);
-                has_next_page = res.media.page_info.has_next_page;
-                end_cursor = res.media.page_info.end_cursor;
-            }else{
-                has_next_page = false;
-            }
-        }
-        return nodes;
-    }
-}

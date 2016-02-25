@@ -13,7 +13,7 @@
     "persistent": false,
     "scripts": ["background/index.js"]
   },
-  "page_action": {
+  "browser_action": {
     "default_title": "Instagram Web Tools",
     "default_popup": "popup/index.html",
     "default_icon": {
@@ -33,5 +33,6 @@
     "16": "icons/webpack-16.png",
     "32": "icons/webpack-32.png",
     "128": "icons/webpack-96.png"
-  }
+  },
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }
