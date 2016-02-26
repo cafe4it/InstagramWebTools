@@ -312,12 +312,14 @@ function isDetailPage(href) {
             h1.parentNode.appendChild(newSpan);
             $(button).on('click', function (e) {
                 e.preventDefault();
-                var MyWorker = require("worker!../shared/index.js");
-                var worker = new MyWorker();
+                var worker = new Worker(chrome.runtime.getURL('shared/worker.js'));
+
+                worker.onmessage = function(event) {
+                    console.log('Result...',event.data);
+                };
+
                 worker.postMessage(window.location.href);
-                worker.onmessage = function (e) {
-                    console.info('worker', e);
-                }
+
                 //$(this).prop('disabled',true);
                 /*setTimeout(function () {
                     chrome.runtime.sendMessage({
@@ -345,15 +347,6 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         //var nodes = scanAllFromUser(msg.data);
         //sendResponse({id : msg.data, nodes : nodes});
         //var worker = new Worker(require('worker!../shared/index.js'));
-        var MyWorker = require("worker!../shared/index.js");
-        var worker = new MyWorker();
-        worker.postMessage(msg.data);
-        worker.onmessage = function (e) {
-            console.info('worker', e);
-        }
-        worker.onerror = function (e) {
-            console.error('worker', e);
-        }
     }
 });
 

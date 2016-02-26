@@ -1,7 +1,4 @@
 import _ from 'lodash';
-//import scanAllFromUser from '../shared/index.js';
-//import testRequest from '../shared/request.js';
-
 chrome.runtime.onInstalled.addListener(function () {
     var db = {
         users: []

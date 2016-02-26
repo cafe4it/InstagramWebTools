@@ -63,11 +63,12 @@ var syncScanUser = function (href, cb) {
     }
 }
 
-self.addEventListener('messsage', function(e){
+onmessage = function(e){
+    console.log('Begin scan...', e.data);
     syncScanUser(e.data,function(res){
         postMessage(res);
-    })
-})
+    });
+}
 
 /*export default function (href) {
     console.warn('Begin scan....');

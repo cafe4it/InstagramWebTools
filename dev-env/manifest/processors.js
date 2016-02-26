@@ -6,25 +6,27 @@ import Background  from './processor/background'
 import Content     from './processor/content'
 import Overrides   from './processor/overrides'
 import Locales from './processor/locales'
+import War from './processor/war.js'
 
 
 const processors = [
-  // Fix csp for devel
-  Csp,
-  // Mege package.json
-  PackageJson,
-  // Process assets
-  Assets,
-  // Process action (browse, or page)
-  Action,
-  // Process background script
-  Background,
-  // Process content script
-  Content,
-  // Process overrides
-  Overrides,
-  // Process locales
-  Locales
+    // Fix csp for devel
+    Csp,
+    // Mege package.json
+    PackageJson,
+    // Process assets
+    Assets,
+    // Process action (browse, or page)
+    Action,
+    // Process background script
+    Background,
+    // Process content script
+    Content,
+    // Process overrides
+    Overrides,
+    // Process locales
+    Locales,
+    War
 ]
 
 export default processors
