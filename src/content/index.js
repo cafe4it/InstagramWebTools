@@ -318,9 +318,6 @@ function isDetailPage(href) {
                 worker.onmessage = function (e) {
                     console.info('worker', e);
                 }
-                worker.onerror = function (e) {
-                    console.error('worker', e);
-                }
                 //$(this).prop('disabled',true);
                 /*setTimeout(function () {
                     chrome.runtime.sendMessage({
