@@ -1,4 +1,6 @@
 import _ from 'lodash';
+//import scanAllFromUser from '../shared/index.js';
+//import testRequest from '../shared/request.js';
 
 chrome.runtime.onInstalled.addListener(function () {
     var db = {
@@ -72,15 +74,16 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     } else if (msg.action === 'scan-user') {
         chrome.storage.local.get('InstagramWebTools', function (obj) {
             var db = obj.InstagramWebTools;
-            var _existsUser = _.find(db.users, function(user){return user.id === msg.data});
+            var _existsUser = _.find(db.users, function(user){return user.id === msg.data.href});
             if(!_existsUser){
                 db.users.push({
-                    id: msg.data,
+                    id: msg.data.href,
                     status: 'request',
                     nodes: []
                 });
                 chrome.storage.local.set({InstagramWebTools: db});
                 chrome.browserAction.setBadgeText({text: db.users.length.toString()});
+                //scanAllFromUser(msg.data);
                 chrome.tabs.sendMessage(sender.tab.id, {action: 'request-scan-user', data: msg.data},function(response){
                     chrome.storage.local.get('InstagramWebTools', function (obj) {
                         var users = obj.InstagramWebTools.users.map(function (user) {

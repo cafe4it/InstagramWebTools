@@ -1,5 +1,5 @@
 {
-  "name": "Instagram Web Tools",
+  "name": "__MSG_extName__",
   "description" : "Easy download photos, images from www.instagram.com",
   "version": "0.1.0",
   "manifest_version": 2,
@@ -14,7 +14,7 @@
     "scripts": ["background/index.js"]
   },
   "browser_action": {
-    "default_title": "Instagram Web Tools",
+    "default_title": "__MSG_extName__",
     "default_popup": "popup/index.html",
     "default_icon": {
       "38": "$assets/webpack-38.png"

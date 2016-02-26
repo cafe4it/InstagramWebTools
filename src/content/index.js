@@ -5,7 +5,7 @@ import _ from 'lodash';
 import '../shared/reset.css';
 import '../shared/tooltip.css';
 import './index.css';
-import scanAllFromUser from '../shared/index.js';
+//import scanAllFromUser from '../shared/index.js';
 
 var _IS_DETAIL_PAGE = false;
 var _IS_USER_PAGE = false;
@@ -311,14 +311,23 @@ function isDetailPage(href) {
             newSpan.appendChild(button);
             h1.parentNode.appendChild(newSpan);
             $(button).on('click', function (e) {
-                //e.preventDefault();
-                setTimeout(function(){
+                e.preventDefault();
+                var MyWorker = require("worker!../shared/index.js");
+                var worker = new MyWorker();
+                worker.postMessage(window.location.href);
+                worker.onmessage = function (e) {
+                    console.info('worker', e);
+                }
+                worker.onerror = function (e) {
+                    console.error('worker', e);
+                }
+                //$(this).prop('disabled',true);
+                /*setTimeout(function () {
                     chrome.runtime.sendMessage({
-                        action : 'scan-user',
-                        data : window.location.href
+                        action: 'scan-user',
+                        data: window.location.href
                     });
-                },1000);
-                $(this).prop('disabled',true);
+                }, 1000);*/
             })
         }
     }
@@ -336,8 +345,18 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     } else if (msg.action === 'popup_AskUser' && _IS_USER_PAGE) {
         sendResponse({username: window.location.pathname.match(/[\w\.]+/g)[0] || ''});
     } else if (msg.action === 'request-scan-user') {
-        var nodes = scanAllFromUser(msg.data);
-        sendResponse({id : msg.data, nodes : nodes});
+        //var nodes = scanAllFromUser(msg.data);
+        //sendResponse({id : msg.data, nodes : nodes});
+        //var worker = new Worker(require('worker!../shared/index.js'));
+        var MyWorker = require("worker!../shared/index.js");
+        var worker = new MyWorker();
+        worker.postMessage(msg.data);
+        worker.onmessage = function (e) {
+            console.info('worker', e);
+        }
+        worker.onerror = function (e) {
+            console.error('worker', e);
+        }
     }
 });
 
