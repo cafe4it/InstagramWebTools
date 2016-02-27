@@ -5,10 +5,10 @@ import _ from 'lodash';
 import '../shared/reset.css';
 import '../shared/tooltip.css';
 import './index.css';
-//import scanAllFromUser from '../shared/index.js';
 
 var _IS_DETAIL_PAGE = false;
 var _IS_USER_PAGE = false;
+var _WORKER_SCRIPT = undefined;
 const icons = [
     {
         id: 'contextMenu_SaveAs',
@@ -26,6 +26,14 @@ const icons = [
 ]
 
 $(document).on('ready', function () {
+    console.info(chrome.runtime.getURL('shared/worker.js'))
+    var request = new XMLHttpRequest();
+    request.open('GET', chrome.runtime.getURL('shared/worker.js'),false);
+    request.send();
+
+    if(request.status === 200){
+        _WORKER_SCRIPT = request.responseText;
+    }
 
     var btnClipboard = document.createElement('button');
     btnClipboard.id = 'btnClipboard';
@@ -312,12 +320,31 @@ function isDetailPage(href) {
             h1.parentNode.appendChild(newSpan);
             $(button).on('click', function (e) {
                 e.preventDefault();
-                var worker = new Worker(chrome.runtime.getURL('shared/worker.js'));
+                var userId = window.location.href;
+                //var rs = scanAllFromUser(userId);
 
-                worker.onmessage = function(event) {
-                    console.log('Result...',event.data);
+                //console.info(rs);
+                // URL.createObjectURL
+                window.URL = window.URL || window.webkitURL;
+
+// "Server response", used in all examples
+                var response = _WORKER_SCRIPT;
+
+                var blob;
+                try {
+                    blob = new Blob([response], {type: 'application/javascript'});
+                } catch (e) { // Backwards-compatibility
+                    window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+                    blob = new BlobBuilder();
+                    blob.append(response);
+                    blob = blob.getBlob();
+                }
+                var worker = new Worker(URL.createObjectURL(blob));
+
+// Test, used in all examples:
+                worker.onmessage = function(e) {
+                    console.warn('result', e.data);
                 };
-
                 worker.postMessage(window.location.href);
 
                 //$(this).prop('disabled',true);

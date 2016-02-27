@@ -1,5 +1,5 @@
 import _ from 'lodash';
-postMessage(document.referrer);
+
 onmessage = function (e) {
     _syncScanUser(e.data);
 }

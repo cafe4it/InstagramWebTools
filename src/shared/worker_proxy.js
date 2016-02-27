@@ -185,21 +185,18 @@
         function loadFrameAndFlush() {
             proxyFrameReady = false;
             proxyFrame = document.createElement('iframe');
-            proxyFrame.setAttribute('data-referer',window.location.href);
-            proxyFrame.src = chrome.runtime.getURL('shared/worker_proxy.html');
+            proxyFrame.src = top.location.href;
             proxyFrame.style.cssText = 'position:fixed!important;' +
                                        'top:-99px!important;' +
                                        'left:-99px!important;' +
                                        'width:2px!important;' +
                                        'height:2px!important;' +
                                        'border:0!important';
-            proxyFrame.onload = function() {
-                var myReferrer = proxyFrame.getAttribute('data-referer');
-                delete window.document.referrer;
-                window.document.__defineGetter__('referrer', function () {
-                    return myReferrer;
-                });
 
+            (document.body || document.documentElement).appendChild(proxyFrame);
+
+            proxyFrame.src = chrome.runtime.getURL('shared/worker_proxy.html');
+            proxyFrame.onload = function() {
                 chrome.runtime.sendMessage(MSG_GET_TOKEN, function(token) {
                     if (typeof token != 'string') {
                         console.warn(
@@ -213,7 +210,6 @@
                     flushMessages(token);
                 });
             };
-            (document.body || document.documentElement).appendChild(proxyFrame);
         }
 
         function flushMessages(token) {

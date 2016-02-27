@@ -11,9 +11,6 @@ const workerProxyPath = 'shared/worker_proxy.html';
 const workerPath = 'shared/worker.js';
 
 export default function(manifest, {buildPath}) {
-    const {web_accessible_resources} = manifest;
-
-    if(!web_accessible_resources) return;
 
     const localWorkerProxySrcPath = path.join(paths.src, workerProxyPath);
     const localWorkerSrcPath = path.join(paths.src, workerPath);

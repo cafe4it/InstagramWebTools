@@ -6,12 +6,12 @@
   "content_scripts": [
     {
       "matches": ["*://*.instagram.com/*"],
-      "js": ["shared/worker_proxy.js","content/index.js"]
+      "js": ["content/index.js"]
     }
   ],
   "background": {
     "persistent": false,
-    "scripts": ["shared/worker_proxy.js","background/index.js"]
+    "scripts": ["background/index.js"]
   },
   "browser_action": {
     "default_title": "__MSG_extName__",
@@ -35,6 +35,6 @@
     "32": "icons/webpack-32.png",
     "128": "icons/webpack-96.png"
   },
-  "web_accessible_resources": [ "shared/worker_proxy.html" ],
+  "web_accessible_resources": [ "shared/worker.js" ],
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }
