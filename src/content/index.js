@@ -6,9 +6,11 @@ import '../shared/reset.css';
 import '../shared/tooltip.css';
 import './index.css';
 
+import scanUser from '../shared/index.js';
+
 var _IS_DETAIL_PAGE = false;
 var _IS_USER_PAGE = false;
-var _WORKER_SCRIPT = undefined;
+
 const icons = [
     {
         id: 'contextMenu_SaveAs',
@@ -26,14 +28,7 @@ const icons = [
 ]
 
 $(document).on('ready', function () {
-    console.info(chrome.runtime.getURL('shared/worker.js'))
-    var request = new XMLHttpRequest();
-    request.open('GET', chrome.runtime.getURL('shared/worker.js'),false);
-    request.send();
 
-    if(request.status === 200){
-        _WORKER_SCRIPT = request.responseText;
-    }
 
     var btnClipboard = document.createElement('button');
     btnClipboard.id = 'btnClipboard';
@@ -321,39 +316,7 @@ function isDetailPage(href) {
             $(button).on('click', function (e) {
                 e.preventDefault();
                 var userId = window.location.href;
-                //var rs = scanAllFromUser(userId);
-
-                //console.info(rs);
-                // URL.createObjectURL
-                window.URL = window.URL || window.webkitURL;
-
-// "Server response", used in all examples
-                var response = _WORKER_SCRIPT;
-
-                var blob;
-                try {
-                    blob = new Blob([response], {type: 'application/javascript'});
-                } catch (e) { // Backwards-compatibility
-                    window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
-                    blob = new BlobBuilder();
-                    blob.append(response);
-                    blob = blob.getBlob();
-                }
-                var worker = new Worker(URL.createObjectURL(blob));
-
-// Test, used in all examples:
-                worker.onmessage = function(e) {
-                    console.warn('result', e.data);
-                };
-                worker.postMessage(window.location.href);
-
-                //$(this).prop('disabled',true);
-                /*setTimeout(function () {
-                    chrome.runtime.sendMessage({
-                        action: 'scan-user',
-                        data: window.location.href
-                    });
-                }, 1000);*/
+                scanUser(userId);
             })
         }
     }
@@ -371,9 +334,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     } else if (msg.action === 'popup_AskUser' && _IS_USER_PAGE) {
         sendResponse({username: window.location.pathname.match(/[\w\.]+/g)[0] || ''});
     } else if (msg.action === 'request-scan-user') {
-        //var nodes = scanAllFromUser(msg.data);
-        //sendResponse({id : msg.data, nodes : nodes});
-        //var worker = new Worker(require('worker!../shared/index.js'));
+
     }
 });
 
