@@ -29,8 +29,14 @@
   "contextMenu_ShareToFacebook": {
     "message": "Share $1 to Facebook"
   },
-  "button_ScanAll": {
+  "button_ScanUser": {
     "message": "Scan"
+  },
+  "button_ReScanUser": {
+    "message": "Scan again"
+  },
+  "button_RemoveUser": {
+    "message": "Remove"
   },
   "button_DownloadAll": {
     "message": "Download All"
@@ -45,7 +51,7 @@
     "message": "Username"
   },
   "popup_table_col2" :{
-    "message": "Total/Videos"
+    "message": "Total/Images/Videos"
   },
   "popup_table_empty" :{
     "message" : "No data..."

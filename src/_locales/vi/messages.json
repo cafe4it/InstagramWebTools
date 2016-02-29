@@ -1,33 +1,42 @@
 {
-  "extName" : {
-    "message" : "Instagram Easy Downloader"
+  "extName": {
+    "message": "Instagram Easy Downloader"
   },
-  "extDescription" : {
-    "message" : "Dễ dàng tải/sao chép ảnh độ phân giải cao 1080x1080px(nếu có)/video trên www.instagram.com"
+  "extDescription": {
+    "message": "Dễ dàng tải/sao chép ảnh độ phân giải cao 1080x1080px(nếu có)/video trên www.instagram.com"
   },
-  "popupReadyForDownload" : {
-    "message" : "Sẵn sàng tải xuống"
+  "popupReadyForDownload": {
+    "message": "Sẵn sàng tải xuống"
   },
-  "typeImage" :{
-    "message" : "ảnh"
+  "typeImage": {
+    "message": "ảnh"
   },
-  "typeVideo" :{
-    "message" : "video"
+  "typeVideo": {
+    "message": "video"
   },
-  "contextMenu_SaveAs" :{
-    "message" : "Lưu $1 dưới dạng..."
+  "contextMenu_SaveAs": {
+    "message": "Lưu $1 dưới dạng..."
   },
-  "contextMenu_CopyURL" :{
-    "message" : "Sao chép liên kết $1"
+  "contextMenu_CopyURL": {
+    "message": "Sao chép liên kết $1"
   },
-  "contextMenu_OpenInNewTab" :{
-    "message" : "Mở $1 trong cửa sổ mới"
+  "contextMenu_OpenInNewTab": {
+    "message": "Mở $1 trong cửa sổ mới"
   },
   "contextMenu_ShareToTumblr": {
     "message": "Chia sẻ $1 to Tumblr"
   },
   "contextMenu_ShareToFacebook": {
     "message": "Chia sẻ $1 to Facebook"
+  },
+  "button_ScanUser": {
+    "message": "Quét"
+  },
+  "button_ReScanUser": {
+    "message": "Quét lại"
+  },
+  "button_RemoveUser": {
+    "message": "Xoá"
   },
   "button_DownloadAll": {
     "message": "Lưu tất cả"
@@ -37,5 +46,14 @@
   },
   "button_DownloadVideos": {
     "message": "Chỉ lưu video"
+  },
+  "popup_table_col1": {
+    "message": "Tên người dùng"
+  },
+  "popup_table_col2": {
+    "message": "Tổng/Ảnh/Videos"
+  },
+  "popup_table_empty": {
+    "message": "Chưa có dữ liệu..."
   }
 }

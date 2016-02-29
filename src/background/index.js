@@ -1,4 +1,6 @@
 import _ from 'lodash';
+import LocalStorage from '../shared/db.js';
+
 chrome.runtime.onInstalled.addListener(function () {
     var db = {
         users: []
@@ -10,6 +12,8 @@ let MEDIA = undefined;
 let _IS_DETAIL_PAGE = false;
 let _IS_USER_PAGE = false;
 let _IS_SHOW_PAGE_ACTION = true;
+
+let _INSTAGRAM_TAB_ID = undefined;
 
 const showPageAction = function (tabId, data) {
     _IS_DETAIL_PAGE = data.isDetailPage;
@@ -37,7 +41,10 @@ const showPageAction = function (tabId, data) {
 }
 
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-    if (msg.action === 'show-contextMenuInstagram') {
+    if (msg.action === 'show-PageAction') {
+        _INSTAGRAM_TAB_ID = sender.tab.id;
+        chrome.pageAction.show(_INSTAGRAM_TAB_ID);
+    } else if (msg.action === 'show-contextMenuInstagram') {
         var subTitle = (msg.data.type === 'VIDEO') ? chrome.i18n.getMessage('typeVideo') : chrome.i18n.getMessage('typeImage');
         MEDIA = msg.data;
         //console.info(MEDIA);
@@ -60,59 +67,54 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         chrome.contextMenus.removeAll();
     } else if (msg.action === 'update-Media') {
         MEDIA = msg.data;
-    } else if (msg.action === 'isDetailPage') {
-        //showPageAction(sender.tab.id, msg.data);
     } else if (msg.action === 'download-Media') {
         chrome.downloads.download({url: MEDIA.src});
     } else if (msg.action === 'copy-Media') {
         chrome.tabs.sendMessage(sender.tab.id, {action: 'copyURL'});
     } else if (msg.action === 'open-Media') {
         chrome.tabs.create({url: MEDIA.src});
-    } else if (msg.action === 'scan-user') {
+    } else if (msg.action === 'DB_initUser') {
+        LocalStorage.initUser(msg.data, function(){
+            chrome.tabs.sendMessage(_INSTAGRAM_TAB_ID, {
+                action: 'request-scan-user',
+                data: msg.data
+            });
+            sendResponse(true);
+        })
+    } else if(msg.action === 'DB_insertUser'){
+        LocalStorage.insertUser(msg.data.userId, msg.data.nodes, msg.data.status, function(result){
+            sendResponse(result);
+        })
+    } else if(msg.action === 'DB_removeUser'){
+        LocalStorage.removeUser(msg.data.userId,function(result){
+            sendResponse(result);
+        })
+    }
+    else if (msg.action === 'download-all') {
         chrome.storage.local.get('InstagramWebTools', function (obj) {
-            var db = obj.InstagramWebTools;
-            var _existsUser = _.find(db.users, function(user){return user.id === msg.data.href});
-            if(!_existsUser){
-                db.users.push({
-                    id: msg.data.href,
-                    status: 'request',
-                    nodes: []
-                });
-                chrome.storage.local.set({InstagramWebTools: db});
-                chrome.browserAction.setBadgeText({text: db.users.length.toString()});
-                //scanAllFromUser(msg.data);
-                chrome.tabs.sendMessage(sender.tab.id, {action: 'request-scan-user', data: msg.data},function(response){
-                    chrome.storage.local.get('InstagramWebTools', function (obj) {
-                        var users = obj.InstagramWebTools.users.map(function (user) {
-                            if (user.id === response.id) {
-                                user = _.extend(user, {nodes: response.nodes, status: 'completed'});
-                            }
-                            return user;
-                        });
-                        chrome.storage.local.set({InstagramWebTools: _.extend(obj.InstagramWebTools, {users: users})});
-                    })
-                });
-            }
-        });
-    } else if(msg.action === 'download-all'){
-        chrome.storage.local.get('InstagramWebTools',function(obj){
-            var user = _.find(obj.InstagramWebTools.users, function(user){ return user.id === msg.data.userId});
-            if(user){
+            var user = _.find(obj.InstagramWebTools.users, function (user) {
+                return user.id === msg.data.userId
+            });
+            if (user) {
                 var nodes = [];
-                switch(msg.data.cmd){
+                switch (msg.data.cmd) {
                     case 'button_DownloadAll':
                         nodes = user.nodes;
                         break;
                     case 'button_DownloadImages':
-                        nodes = _.filter(user.nodes, function(node){ return node.is_video === false});
+                        nodes = _.filter(user.nodes, function (node) {
+                            return node.is_video === false
+                        });
                         break;
                     case 'button_DownloadVideos':
-                        nodes = _.filter(user.nodes, function(node){ return node.is_video === true});
+                        nodes = _.filter(user.nodes, function (node) {
+                            return node.is_video === true
+                        });
                         break;
                 }
 
-                _.each(nodes, function(node){
-                    chrome.downloads.download({url : node.src, filename : node.filename});
+                _.each(nodes, function (node) {
+                    chrome.downloads.download({url: node.src, filename: node.filename});
                 })
             }
         })
@@ -130,12 +132,6 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
         chrome.runtime.sendMessage({action: 'open-Media'});
     }
 });
-
-/*chrome.pageAction.onClicked.addListener(function (tab) {
- if (_IS_DETAIL_PAGE && MEDIA && MEDIA.src !== null) {
- chrome.runtime.sendMessage({action: 'download-Media'});
- }
- });*/
 
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     if (changeInfo.status === 'complete') {

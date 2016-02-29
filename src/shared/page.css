@@ -50,3 +50,8 @@ table{
     width: 500px;
     min-width: 500px;
 }
+
+#popup_banner{
+    min-width: 500px;
+    width : 500px;
+}

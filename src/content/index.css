@@ -42,3 +42,13 @@ a._8mlbc{
 ._5axto {
     margin-bottom: 10px !important;
 }
+
+._enabled{
+    border-color: firebrick !important;
+    color : firebrick !important;
+}
+
+._disabled{
+    border-color: gray !important;
+    color:gray !important;
+}
