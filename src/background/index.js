@@ -1,3 +1,5 @@
+import _gaq  from '../shared/ga.js';
+
 import _ from 'lodash';
 import LocalStorage from '../shared/db.js';
 
@@ -79,6 +81,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
                 action: 'request-scan-user',
                 data: msg.data
             });
+            _gaq.push(['_trackEvent', 'Scan clicked', msg.data]);
             sendResponse(true);
         })
     } else if(msg.action === 'DB_insertUser'){
@@ -97,22 +100,26 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
             });
             if (user) {
                 var nodes = [];
+                var label = 'Download';
                 switch (msg.data.cmd) {
                     case 'button_DownloadAll':
                         nodes = user.nodes;
+                        label = 'Download All'
                         break;
                     case 'button_DownloadImages':
                         nodes = _.filter(user.nodes, function (node) {
                             return node.is_video === false
                         });
+                        label = 'Download Images'
                         break;
                     case 'button_DownloadVideos':
                         nodes = _.filter(user.nodes, function (node) {
                             return node.is_video === true
                         });
+                        label = 'Download Videos'
                         break;
                 }
-
+                _gaq.push(['_trackEvent', label, msg.data.userId]);
                 _.each(nodes, function (node) {
                     chrome.downloads.download({url: node.src, filename: node.filename});
                 })
