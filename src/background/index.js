@@ -1,9 +1,9 @@
-import _gaq  from '../shared/ga.js';
-
 import _ from 'lodash';
 import LocalStorage from '../shared/db.js';
+require('script!../shared/amplitude.js');
 
 chrome.runtime.onInstalled.addListener(function () {
+    amplitude.logEvent('Installed');
     var db = {
         users: []
     }
@@ -82,7 +82,10 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
                 action: 'request-scan-user',
                 data: msg.data
             });
-            _gaq.push(['_trackEvent', 'Scan clicked', msg.data]);
+            //_gaq.push(['_trackEvent', 'Scan clicked', msg.data]);
+            amplitude.logEvent('Scan clicked', {
+                Url : msg.data
+            });
             sendResponse(true);
         })
     } else if(msg.action === 'DB_insertUser'){
@@ -120,7 +123,10 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
                         label = 'Download Videos'
                         break;
                 }
-                _gaq.push(['_trackEvent', label, msg.data.userId]);
+                //_gaq.push(['_trackEvent', label, msg.data.userId]);
+                amplitude.logEvent(label, {
+                    Url : msg.data.userId
+                });
                 _.each(nodes, function (node) {
                     chrome.downloads.download({url: node.src, filename: node.filename});
                 })

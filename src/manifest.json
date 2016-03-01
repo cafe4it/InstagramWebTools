@@ -22,8 +22,8 @@
   },
   "permissions": [
     "contextMenus",
-    "background",
     "tabs",
+    "background",
     "downloads",
     "storage"
   ],
@@ -34,5 +34,5 @@
     "32": "icons/webpack-32.png",
     "128": "icons/webpack-96.png"
   },
-  "content_security_policy": "script-src 'self' https://ssl.google-analytics.com 'unsafe-eval'; object-src 'self'"
+  "content_security_policy": "script-src 'self' 'unsafe-eval' https://d24n15hnbwhuhn.cloudfront.net; object-src 'self'"
 }

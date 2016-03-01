@@ -1,6 +1,6 @@
 {
   "name": "__MSG_extName__",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "__MSG_extDescription__",
   "default_locale": "en",
   "private": true,
@@ -23,6 +23,7 @@
     "hmr"
   ],
   "dependencies": {
+    "keen-js": "^3.4.0",
     "purecss": "^0.6.0",
     "react": "0.14.7"
   },
@@ -43,6 +44,7 @@
     "json-loader": "0.5.4",
     "lodash": "4.1.0",
     "raw-loader": "^0.5.1",
+    "script-loader": "^0.6.1",
     "style-loader": "^0.13.0",
     "url-loader": "0.5.7",
     "webpack": "1.12.2",
