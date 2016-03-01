@@ -19,7 +19,7 @@ var iconsOther = [
     {id: 'button_RemoveUser', src: require('../icons/button_removeuser.png')}
 ]
 
-var bannerSrc = require('../icons/popup_banner.png');
+//var bannerSrc = require('../icons/popup_banner.png');
 
 const loadingBarSrc = require('../icons/loadingBar.gif');
 const loadingBar = '<img src="' + loadingBarSrc + '" width=110px/>'
@@ -45,7 +45,7 @@ var buttons = buttonsBuilder(icons);
 var buttonsOther = buttonsBuilder(iconsOther);
 
 $(document).ready(function () {
-    $('#popup_banner').attr('src', bannerSrc);
+    //$('#popup_banner').attr('src', bannerSrc);
     $('th.col1').html(chrome.i18n.getMessage('popup_table_col1'));
     $('th.col2').html(chrome.i18n.getMessage('popup_table_col2'));
     loadTableData();

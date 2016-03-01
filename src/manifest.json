@@ -21,7 +21,6 @@
     }
   },
   "permissions": [
-    "*://*.instagram.com/*",
     "contextMenus",
     "background",
     "tabs",

@@ -47,6 +47,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         _INSTAGRAM_TAB_ID = sender.tab.id;
         chrome.pageAction.show(_INSTAGRAM_TAB_ID);
     } else if (msg.action === 'show-contextMenuInstagram') {
+        chrome.contextMenus.removeAll();
         var subTitle = (msg.data.type === 'VIDEO') ? chrome.i18n.getMessage('typeVideo') : chrome.i18n.getMessage('typeImage');
         MEDIA = msg.data;
         //console.info(MEDIA);
