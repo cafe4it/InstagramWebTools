@@ -5,7 +5,6 @@ const _AnalyticsCode = 'UA-74453743-1';
 let service, tracker;
 
 var importScript = (function (oHead) {
-    //window.analytics = analytics;
     function loadError(oError) {
         throw new URIError("The script " + oError.target.src + " is not accessible.");
     }

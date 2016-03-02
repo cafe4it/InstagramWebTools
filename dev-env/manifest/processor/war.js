@@ -7,7 +7,7 @@ import * as log from '../log'
 import * as Remove from '../../util/remove';
 import script from './lib/script'
 
-//const workerProxyPath = 'shared/worker_proxy.html';
+
 const gaPath = "shared/google-analytics-bundle.js";
 
 export default function(manifest, {buildPath}) {

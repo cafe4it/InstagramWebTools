@@ -6,7 +6,7 @@ import '../shared/reset.css';
 import '../shared/tooltip.css';
 import './index.css';
 
-import scanUser from '../shared/index.js';
+import scanUser from '../shared/fetch.js';
 import utils from '../shared/utils.js';
 import LocalStorage from '../shared/db.js';
 

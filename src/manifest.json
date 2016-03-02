@@ -22,9 +22,10 @@
   },
   "permissions": [
     "https://www.google-analytics.com/*",
+    "https://www.instagram.com/*",
+    "https://www.tumblr.com/widgets/share/tool*",
     "contextMenus",
     "tabs",
-    "background",
     "downloads",
     "storage"
   ],
