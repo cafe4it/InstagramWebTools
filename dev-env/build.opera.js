@@ -8,9 +8,10 @@ import clc from 'cli-color';
 // package
 import makeWebpackConfig from './webpack/config';
 import webpackBuild from './webpack/build';
-import Manifest from './manifest'
 import * as paths from './paths'
 
 // Clear release direcotry
-fs.removeSync(paths.release)
-fs.mkdirSync(paths.release)
+fs.removeSync(paths.release);
+fs.mkdirSync(paths.release);
+
+
