@@ -42,7 +42,7 @@ let _IS_DETAIL_PAGE = false;
 let _IS_USER_PAGE = false;
 let _IS_SHOW_PAGE_ACTION = true;
 
-let _INSTAGRAM_TAB_ID = undefined;
+//let _INSTAGRAM_TAB_ID = undefined;
 
 const showPageAction = function (tabId, data) {
     _IS_DETAIL_PAGE = data.isDetailPage;
@@ -71,10 +71,9 @@ const showPageAction = function (tabId, data) {
 
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.action === 'show-PageAction') {
-        _INSTAGRAM_TAB_ID = sender.tab.id;
         tracker.sendAppView('App view');
-        tracker.sendEvent('App', 'Begin', sender.url || sender.tab.url || '');
-        chrome.pageAction.show(_INSTAGRAM_TAB_ID);
+        tracker.sendEvent('App', 'Open', sender.url || sender.tab.url || '', sender.tab.id);
+        chrome.pageAction.show(sender.tab.id);
     } else if (msg.action === 'change-Url-Of-User') {
         tracker.sendEvent('App', 'Surf', msg.data || '');
     } else if (msg.action === 'show-contextMenuInstagram') {
@@ -111,7 +110,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         //tracker.sendEvent('App', 'User Clicked', 'Scan', msg.data.toString());
         tracker.sendEvent('App', 'Scan', msg.data);
         LocalStorage.initUser(msg.data, function () {
-            chrome.tabs.sendMessage(_INSTAGRAM_TAB_ID, {
+            chrome.tabs.sendMessage(sender.tab.id, {
                 action: 'request-scan-user',
                 data: msg.data
             });
@@ -184,8 +183,6 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     }
 });
 
-chrome.tabs.onRemoved.addListener(function (tabId) {
-    if (_INSTAGRAM_TAB_ID === tabId) {
-        tracker.sendEvent('App', 'End');
-    }
+chrome.tabs.onRemoved.addListener(function (tabId, changeInfo) {
+    tracker.sendEvent('App', 'Close','', tabId);
 })
