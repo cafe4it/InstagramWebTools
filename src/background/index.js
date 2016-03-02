@@ -1,9 +1,36 @@
 import _ from 'lodash';
 import LocalStorage from '../shared/db.js';
-require('script!../shared/amplitude.js');
+
+const _AnalyticsCode = 'UA-74453743-1';
+let service, tracker;
+
+var importScript = (function (oHead) {
+
+    function loadError(oError) {
+        throw new URIError("The script " + oError.target.src + " is not accessible.");
+    }
+
+    return function (sSrc, fOnload) {
+        var oScript = document.createElement("script");
+        oScript.type = "text\/javascript";
+        oScript.onerror = loadError;
+        if (fOnload) {
+            oScript.onload = fOnload;
+        }
+        oHead.appendChild(oScript);
+        oScript.src = sSrc;
+    }
+
+})(document.head || document.getElementsByTagName("head")[0]);
+
+importScript(chrome.runtime.getURL('shared/google-analytics-bundle.js'), function () {
+    console.info('google analytics platform loaded...');
+    service = analytics.getService('instagram_easy_downloader');
+    tracker = service.getTracker(_AnalyticsCode);
+});
 
 chrome.runtime.onInstalled.addListener(function () {
-    amplitude.logEvent('Installed');
+    //amplitude.logEvent('Installed');
     var db = {
         users: []
     }
@@ -45,7 +72,11 @@ const showPageAction = function (tabId, data) {
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.action === 'show-PageAction') {
         _INSTAGRAM_TAB_ID = sender.tab.id;
+        tracker.sendAppView('App view');
+        tracker.sendEvent('App', 'Begin', sender.url || sender.tab.url || '');
         chrome.pageAction.show(_INSTAGRAM_TAB_ID);
+    } else if (msg.action === 'change-Url-Of-User') {
+        tracker.sendEvent('App', 'Surf', msg.data || '');
     } else if (msg.action === 'show-contextMenuInstagram') {
         chrome.contextMenus.removeAll();
         var subTitle = (msg.data.type === 'VIDEO') ? chrome.i18n.getMessage('typeVideo') : chrome.i18n.getMessage('typeImage');
@@ -77,23 +108,22 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     } else if (msg.action === 'open-Media') {
         chrome.tabs.create({url: MEDIA.src});
     } else if (msg.action === 'DB_initUser') {
-        LocalStorage.initUser(msg.data, function(){
+        //tracker.sendEvent('App', 'User Clicked', 'Scan', msg.data.toString());
+        tracker.sendEvent('App', 'Scan', msg.data);
+        LocalStorage.initUser(msg.data, function () {
             chrome.tabs.sendMessage(_INSTAGRAM_TAB_ID, {
                 action: 'request-scan-user',
                 data: msg.data
             });
             //_gaq.push(['_trackEvent', 'Scan clicked', msg.data]);
-            amplitude.logEvent('Scan clicked', {
-                Url : msg.data
-            });
             sendResponse(true);
         })
-    } else if(msg.action === 'DB_insertUser'){
-        LocalStorage.insertUser(msg.data.userId, msg.data.nodes, msg.data.status, function(result){
+    } else if (msg.action === 'DB_insertUser') {
+        LocalStorage.insertUser(msg.data.userId, msg.data.nodes, msg.data.status, function (result) {
             sendResponse(result);
         })
-    } else if(msg.action === 'DB_removeUser'){
-        LocalStorage.removeUser(msg.data.userId,function(result){
+    } else if (msg.action === 'DB_removeUser') {
+        LocalStorage.removeUser(msg.data.userId, function (result) {
             sendResponse(result);
         })
     }
@@ -123,10 +153,11 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
                         label = 'Download Videos'
                         break;
                 }
+                tracker.sendEvent('App', label, msg.data.userId);
                 //_gaq.push(['_trackEvent', label, msg.data.userId]);
-                amplitude.logEvent(label, {
-                    Url : msg.data.userId
-                });
+                /*amplitude.logEvent(label, {
+                 Url : msg.data.userId
+                 });*/
                 _.each(nodes, function (node) {
                     chrome.downloads.download({url: node.src, filename: node.filename});
                 })
@@ -153,3 +184,8 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     }
 });
 
+chrome.tabs.onRemoved.addListener(function (tabId) {
+    if (_INSTAGRAM_TAB_ID === tabId) {
+        tracker.sendEvent('App', 'End');
+    }
+})

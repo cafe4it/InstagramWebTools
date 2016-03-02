@@ -6,7 +6,7 @@ import Background  from './processor/background'
 import Content     from './processor/content'
 import Overrides   from './processor/overrides'
 import Locales from './processor/locales'
-//import War from './processor/war.js'
+import War from './processor/war.js'
 
 
 const processors = [
@@ -26,7 +26,7 @@ const processors = [
     Overrides,
     // Process locales
     Locales,
-    //War
+    War
 ]
 
 export default processors

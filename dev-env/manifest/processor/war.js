@@ -7,24 +7,24 @@ import * as log from '../log'
 import * as Remove from '../../util/remove';
 import script from './lib/script'
 
-const workerProxyPath = 'shared/worker_proxy.html';
-const workerPath = 'shared/worker.js';
+//const workerProxyPath = 'shared/worker_proxy.html';
+const gaPath = "shared/google-analytics-bundle.js";
 
 export default function(manifest, {buildPath}) {
 
-    const localWorkerProxySrcPath = path.join(paths.src, workerProxyPath);
-    const localWorkerSrcPath = path.join(paths.src, workerPath);
+    //const localWorkerProxySrcPath = path.join(paths.src, workerProxyPath);
+    const localGaSrcPath = path.join(paths.src, gaPath);
     const scripts = []
 
-    log.pending(`Processing web-worker '${localWorkerProxySrcPath}','${localWorkerSrcPath}'`);
+    log.pending(`Processing google analytics platform '${localGaSrcPath}'`);
 
-    const buildWorkerProxyPath = path.join(buildPath, workerProxyPath);
+    const buildGaPath = path.join(buildPath, gaPath);
     //const buildWorkerPath = path.join(buildPath, workerPath);
 
-    fs.copySync(localWorkerProxySrcPath, buildWorkerProxyPath);
+    fs.copySync(localGaSrcPath, buildGaPath);
     //fs.copySync(localWorkerSrcPath, buildWorkerPath);
-    script(workerPath,buildPath);
-    scripts.push(workerPath);
+    //script(workerPath,buildPath);
+    //scripts.push(workerPath);
     log.done(`Done`)
 
     return {manifest, scripts}

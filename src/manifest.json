@@ -21,6 +21,7 @@
     }
   },
   "permissions": [
+    "https://www.google-analytics.com/*",
     "contextMenus",
     "tabs",
     "background",
@@ -34,5 +35,6 @@
     "32": "icons/webpack-32.png",
     "128": "icons/webpack-96.png"
   },
-  "content_security_policy": "script-src 'self' 'unsafe-eval' https://d24n15hnbwhuhn.cloudfront.net; object-src 'self'"
+  "web_accessible_resources" : ["shared/google-analytics-bundle.js"],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

@@ -12,7 +12,8 @@ import LocalStorage from '../shared/db.js';
 
 var _IS_DETAIL_PAGE = false;
 var _IS_USER_PAGE = false;
-//var _SCRIPT_WORKER = undefined;
+const detailPageRegex = /instagram\.com\/p\//g;
+const userPageRegex = /instagram\.com\/[\w\.]+\/$/g;
 
 const icons = [
     {
@@ -181,8 +182,6 @@ function removeMenuContext() {
 }
 
 function isDetailPage(href) {
-    var detailPageRegex = /instagram\.com\/p\//g,
-        userPageRegex = /instagram\.com\/[\w\.]+\/$/g;
     _IS_DETAIL_PAGE = detailPageRegex.test(href);
     _IS_USER_PAGE = userPageRegex.test(href);
 
@@ -221,7 +220,7 @@ function isDetailPage(href) {
             LocalStorage.findUserById(userId, function (user) {
                 if (user) {
                     button.textContent = chrome.i18n.getMessage('button_ReScanUser');
-                    if(user.status === 'request'){
+                    if (user.status === 'request') {
                         button.setAttribute('disabled', true);
                         button.setAttribute('class', '_jvpff _k2yal _csba8 _i46jh _nv5lf _disabled');
                     }
@@ -258,5 +257,59 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         sendResponse({username: window.location.pathname.match(/[\w\.]+/g)[0] || ''});
     } else if (msg.action === 'request-scan-user') {
         scanUser(msg.data);
+    }
+});
+
+(function ($) {
+        // Default to the current location.
+        var strLocation = window.location.href;
+        var strHash = window.location.hash;
+        var strPrevLocation = "";
+        var strPrevHash = "";
+        // This is how often we will be checkint for
+        // changes on the location.
+        var intIntervalTime = 100;
+        // This method removes the pound from the hash.
+        var fnCleanHash = function (strHash) {
+            return (
+                strHash.substring(1, strHash.length)
+            );
+        }
+        // This will be the method that we use to check
+        // changes in the window location.
+        var fnCheckLocation = function () {
+            // Check to see if the location has changed.
+            if (strLocation != window.location.href) {
+                // Store the new and previous locations.
+                strPrevLocation = strLocation;
+                strPrevHash = strHash;
+                strLocation = window.location.href;
+                strHash = window.location.hash;
+                // The location has changed. Trigger a
+                // change event on the location object,
+                // passing in the current and previous
+                // location values.
+                $(window.location).trigger(
+                    "change",
+                    {
+                        currentHref: strLocation,
+                        currentHash: fnCleanHash(strHash),
+                        previousHref: strPrevLocation,
+                        previousHash: fnCleanHash(strPrevHash)
+                    }
+                );
+            }
+        }
+        // Set an interval to check the location changes.
+        setInterval(fnCheckLocation, intIntervalTime);
+    })(jQuery);
+
+$(window.location).bind("change", function (objEvent, objData) {
+    console.warn(objData);
+    if(userPageRegex.test(objData.currentHref)){
+        chrome.runtime.sendMessage({
+            action : 'change-Url-Of-User',
+            data : objData.currentHref
+        })
     }
 });
