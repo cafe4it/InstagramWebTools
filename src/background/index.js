@@ -5,7 +5,7 @@ const _AnalyticsCode = 'UA-74453743-1';
 let service, tracker;
 
 var importScript = (function (oHead) {
-
+    //window.analytics = analytics;
     function loadError(oError) {
         throw new URIError("The script " + oError.target.src + " is not accessible.");
     }
@@ -28,6 +28,7 @@ importScript(chrome.runtime.getURL('shared/google-analytics-bundle.js'), functio
     service = analytics.getService('instagram_easy_downloader');
     tracker = service.getTracker(_AnalyticsCode);
 });
+
 
 chrome.runtime.onInstalled.addListener(function () {
     //amplitude.logEvent('Installed');
@@ -72,8 +73,9 @@ const showPageAction = function (tabId, data) {
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.action === 'show-PageAction') {
         tracker.sendAppView('App view');
-        tracker.sendEvent('App', 'Open', sender.url || sender.tab.url || '', sender.tab.id);
+        tracker.sendEvent('App', 'Open', sender.url || sender.tab.url | '', sender.tab.id);
         chrome.pageAction.show(sender.tab.id);
+
     } else if (msg.action === 'change-Url-Of-User') {
         tracker.sendEvent('App', 'Surf', msg.data || '');
     } else if (msg.action === 'show-contextMenuInstagram') {
@@ -107,7 +109,6 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     } else if (msg.action === 'open-Media') {
         chrome.tabs.create({url: MEDIA.src});
     } else if (msg.action === 'DB_initUser') {
-        //tracker.sendEvent('App', 'User Clicked', 'Scan', msg.data.toString());
         tracker.sendEvent('App', 'Scan', msg.data);
         LocalStorage.initUser(msg.data, function () {
             chrome.tabs.sendMessage(sender.tab.id, {
@@ -152,6 +153,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
                         label = 'Download Videos'
                         break;
                 }
+
                 tracker.sendEvent('App', label, msg.data.userId);
                 //_gaq.push(['_trackEvent', label, msg.data.userId]);
                 /*amplitude.logEvent(label, {
@@ -184,5 +186,5 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 });
 
 chrome.tabs.onRemoved.addListener(function (tabId, changeInfo) {
-    tracker.sendEvent('App', 'Close','', tabId);
+    tracker.sendEvent('App', 'Close', '', tabId);
 })

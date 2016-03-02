@@ -31,11 +31,9 @@ const icons = [
     }
 ]
 
-
 chrome.runtime.sendMessage({action: 'show-PageAction'});
 
 $(document).on('ready', function () {
-
     var btnClipboard = document.createElement('button');
     btnClipboard.id = 'btnClipboard';
     btnClipboard.style.cssText = 'display : none!important;width : 0px !imporant; height : 0px !important;';
