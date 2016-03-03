@@ -1,6 +1,6 @@
 {
   "name": "__MSG_extName__",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "__MSG_extDescription__",
   "default_locale": "en",
   "private": true,
@@ -40,6 +40,7 @@
     "clipboard": "^1.5.8",
     "css-loader": "^0.23.1",
     "file-loader": "0.8.5",
+    "fs-extra": "^0.26.5",
     "jquery": "^2.2.0",
     "json-loader": "0.5.4",
     "lodash": "4.1.0",

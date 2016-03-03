@@ -70,6 +70,12 @@ const showPageAction = function (tabId, data) {
     });
 }
 
+function trackerSingleEvent(action) {
+    var fullPost = 'https://www.instagram.com' + MEDIA.postUrl;
+    var actionName = action + ((MEDIA.type) ? (' ' + MEDIA.type.toLowerCase()) : '');
+    tracker.sendEvent('App', actionName, fullPost);
+}
+
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.action === 'show-PageAction') {
         tracker.sendAppView('App view');
@@ -104,10 +110,13 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         MEDIA = msg.data;
     } else if (msg.action === 'download-Media') {
         chrome.downloads.download({url: MEDIA.src});
+        trackerSingleEvent('Download');
     } else if (msg.action === 'copy-Media') {
         chrome.tabs.sendMessage(sender.tab.id, {action: 'copyURL'});
+        trackerSingleEvent('Copy');
     } else if (msg.action === 'open-Media') {
         chrome.tabs.create({url: MEDIA.src});
+        trackerSingleEvent('Open');
     } else if (msg.action === 'DB_initUser') {
         tracker.sendEvent('App', 'Scan', msg.data);
         LocalStorage.initUser(msg.data, function () {

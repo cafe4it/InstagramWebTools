@@ -86,8 +86,9 @@ function getMediaSrc(elem) {
 
 function showMenuContext(elem) {
     var _mediaSrc = null, _mediaType = null;
+    var postUrl = ($(elem).is('a')) ? $(elem).attr('href') : null;
     if ($(elem).find('._1lp5e').length > 0) {
-        var postUrl = ($(elem).is('a')) ? $(elem).attr('href') : null;
+        //var postUrl = ($(elem).is('a')) ? $(elem).attr('href') : null;
         var res = $.ajax({
             type: "GET",
             url: postUrl + '&__a=1',
@@ -115,7 +116,8 @@ function showMenuContext(elem) {
         action: 'show-contextMenuInstagram',
         data: {
             src: _mediaSrc,
-            type: _mediaType
+            type: _mediaType,
+            postUrl : utils.getPathFromUrl(postUrl) || window.location.pathname || ''
         }
     });
 
@@ -209,7 +211,8 @@ function isDetailPage(href) {
                 action: 'update-Media',
                 data: {
                     src: rs._mediaSrc,
-                    type: rs._mediaType
+                    type: rs._mediaType,
+                    postUrl : window.location.pathname
                 }
             });
         } else {
