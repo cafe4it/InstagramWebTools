@@ -4,7 +4,7 @@ import 'purecss/build/base-min.css';
 import 'purecss/build/tables-min.css';
 import 'purecss/build/buttons-min.css';
 import '../shared/tooltip.css';
-import 'shared/page.css';
+import '../shared/page.css';
 import _ from 'lodash';
 
 var buttonTpl = _.template('<a class="<%=className%> cmd tooltip-top" data-tooltip="<%=label%>"><img src="<%=imgSrc%>" alt="<%=label%>"/></a>');
@@ -20,6 +20,8 @@ var iconsOther = [
 ]
 
 //var bannerSrc = require('../icons/popup_banner.png');
+
+
 
 const loadingBarSrc = require('../icons/loadingBar.gif');
 const loadingBar = '<img src="' + loadingBarSrc + '" width=110px/>'

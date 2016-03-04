@@ -164,15 +164,14 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
                 }
 
                 tracker.sendEvent('App', label, msg.data.userId);
-                //_gaq.push(['_trackEvent', label, msg.data.userId]);
-                /*amplitude.logEvent(label, {
-                 Url : msg.data.userId
-                 });*/
+
                 _.each(nodes, function (node) {
                     chrome.downloads.download({url: node.src, filename: node.filename});
                 })
             }
         })
+    } else if(msg.action === 'click-Ads'){
+        tracker.sendEvent('App', 'Click ads', msg.data);
     }
 });
 

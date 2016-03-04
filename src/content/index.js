@@ -9,7 +9,7 @@ import './index.css';
 import scanUser from '../shared/index.js';
 import utils from '../shared/utils.js';
 import LocalStorage from '../shared/db.js';
-
+import getAds from '../shared/ads.js';
 var _IS_DETAIL_PAGE = false;
 var _IS_USER_PAGE = false;
 const detailPageRegex = /instagram\.com\/p\//g;
@@ -34,6 +34,7 @@ const icons = [
 chrome.runtime.sendMessage({action: 'show-PageAction'});
 
 $(document).on('ready', function () {
+
     var btnClipboard = document.createElement('button');
     btnClipboard.id = 'btnClipboard';
     btnClipboard.style.cssText = 'display : none!important;width : 0px !imporant; height : 0px !important;';
@@ -50,19 +51,42 @@ $(document).on('ready', function () {
 
     $(window.location).bind("change", function (objEvent, objData) {
         //console.warn(objData);
-        if(!detailPageRegex.test(objData.currentHref)){
-            setTimeout(function(){
+        if (!detailPageRegex.test(objData.currentHref)) {
+            setTimeout(function () {
                 chrome.runtime.sendMessage({
-                    action : 'change-Url-Of-User',
-                    data : objData.currentHref
+                    action: 'change-Url-Of-User',
+                    data: objData.currentHref
                 })
-            },10);
+            }, 10);
         }
+
+        showAds(objData.currentHref);
     });
+
+    showAds(window.location.href);
 })
 
 
 /*----Extend------*/
+
+function showAds(href) {
+    if (!href) return;
+    var _sel = (detailPageRegex.test(href)) ? 'main > div._ba61e' : 'article > header';
+    if (!_sel) return;
+    var _ads = getAds();
+    var header = $(_sel)[0];
+    if (header) {
+        var container = header.parentNode;
+        container.insertBefore(_ads, header.nextSibling);
+        $('p#ads_banner').on('click', 'a', function () {
+            var href = $(this).attr('href') || '';
+            chrome.runtime.sendMessage({
+                action: 'click-Ads',
+                data: href
+            });
+        })
+    }
+}
 
 function getMediaSrc(elem) {
     var rs = $(elem).find('img[id^="pImage_"], video');
@@ -111,13 +135,13 @@ function showMenuContext(elem) {
     if ((_mediaSrc && _mediaType) === false) return;
 
     addToolsPerMedia(elem, _mediaSrc, _mediaType);
-
+    if (postUrl === null) postUrl = window.location.pathname;
     chrome.runtime.sendMessage({
         action: 'show-contextMenuInstagram',
         data: {
             src: _mediaSrc,
             type: _mediaType,
-            postUrl : utils.getPathFromUrl(postUrl) || window.location.pathname || ''
+            postUrl: utils.getPathFromUrl(postUrl) || window.location.pathname || ''
         }
     });
 
@@ -184,8 +208,6 @@ function addToolsPerMedia(elem, _mediaSrc, _mediaType) {
         var wrapper = $(elem).find('div._sppa1')[0];
         if (wrapper) {
             wrapper.appendChild(div);
-            /*var firstChild = wrapper.childNodes[0];
-             wrapper.insertBefore(button, firstChild);*/
         }
     }
 }
@@ -212,7 +234,7 @@ function isDetailPage(href) {
                 data: {
                     src: rs._mediaSrc,
                     type: rs._mediaType,
-                    postUrl : window.location.pathname
+                    postUrl: window.location.pathname
                 }
             });
         } else {
