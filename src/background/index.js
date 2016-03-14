@@ -27,6 +27,7 @@ importScript(chrome.runtime.getURL('shared/google-analytics-bundle.js'), functio
     console.info('google analytics platform loaded...');
     service = analytics.getService('instagram_easy_downloader');
     tracker = service.getTracker(_AnalyticsCode);
+    tracker.sendAppView('App view');
 });
 
 
@@ -70,9 +71,14 @@ const showPageAction = function (tabId, data) {
     });
 }
 
+function trackerSingleEvent(action) {
+    var fullPost = 'https://www.instagram.com' + MEDIA.postUrl;
+    var actionName = action + ((MEDIA.type) ? (' ' + MEDIA.type.toLowerCase()) : '');
+    tracker.sendEvent('App', actionName, fullPost);
+}
+
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.action === 'show-PageAction') {
-        tracker.sendAppView('App view');
         tracker.sendEvent('App', 'Open', sender.url || sender.tab.url | '', sender.tab.id);
         chrome.pageAction.show(sender.tab.id);
 
@@ -104,10 +110,13 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         MEDIA = msg.data;
     } else if (msg.action === 'download-Media') {
         chrome.downloads.download({url: MEDIA.src});
+        trackerSingleEvent('Download');
     } else if (msg.action === 'copy-Media') {
         chrome.tabs.sendMessage(sender.tab.id, {action: 'copyURL'});
+        trackerSingleEvent('Copy');
     } else if (msg.action === 'open-Media') {
         chrome.tabs.create({url: MEDIA.src});
+        trackerSingleEvent('Open');
     } else if (msg.action === 'DB_initUser') {
         tracker.sendEvent('App', 'Scan', msg.data);
         LocalStorage.initUser(msg.data, function () {
@@ -155,15 +164,14 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
                 }
 
                 tracker.sendEvent('App', label, msg.data.userId);
-                //_gaq.push(['_trackEvent', label, msg.data.userId]);
-                /*amplitude.logEvent(label, {
-                 Url : msg.data.userId
-                 });*/
+
                 _.each(nodes, function (node) {
                     chrome.downloads.download({url: node.src, filename: node.filename});
                 })
             }
         })
+    } else if(msg.action === 'click-Ads'){
+        tracker.sendEvent('App', 'Click ads', msg.data);
     }
 });
 
@@ -186,5 +194,5 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 });
 
 chrome.tabs.onRemoved.addListener(function (tabId, changeInfo) {
-    tracker.sendEvent('App', 'Close', '', tabId);
+    //tracker.sendEvent('App', 'Close', '', tabId);
 })
